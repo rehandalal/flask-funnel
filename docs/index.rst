@@ -25,8 +25,7 @@ Configuration
 
 There are several configuration options available for **Flask-Funnel**:
 
-CSS_BUNDLES
-...........
+**CSS_BUNDLES**
 
 A dict of CSS bundles::
 
@@ -39,8 +38,7 @@ A dict of CSS bundles::
 
 *Default:* ``{}``
 
-JS_BUNDLES
-..........
+**JS_BUNDLES**
 
 A dict of JavaScript bundles::
 
@@ -53,46 +51,40 @@ A dict of JavaScript bundles::
 
 *Default:* ``{}``
 
-CSS_MEDIA_DEFAULT
-.................
+**CSS_MEDIA_DEFAULT**
 
 *Default:* ``'screen,projection,tv'``
 
-JAVA_BIN
-........
+**JAVA_BIN**
 
 If you plan on using `YUI Compressor`_ you must set this variable.
 
-It has no default value.
+*It has no default value.*
 
-LESS_BIN
-........
+**LESS_BIN**
 
 If you require `LESS`_ support you must point this to ``lessc``.
 
 *Default:* ``'lessc'``
 
-LESS_PREPROCESS
-...............
+**LESS_PREPROCESS**
 
 If you want LESS files to be compiled when ``app.debug`` is ``True`` and
 compressed files are not being used.
 
 *Default:* ``True``
 
-UGLIFY_BIN
-..........
+**UGLIFY_BIN**
 
 If you want to use `UglifyJS`_ you must set this variable.
 
-It has no default value.
+*It has no default value.*
 
-CLEANCSS_BIN
-............
+**CLEANCSS_BIN**
 
 If you want to use `clean-css`_ you must set this variable.
 
-It has no default value.
+*It has no default value.*
 
 
 Including bundles in templates
