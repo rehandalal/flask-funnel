@@ -40,7 +40,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'flask-funnel'
+project = u'Flask-Funnel'
 copyright = u'2013, Rehan Dalal'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -91,15 +91,17 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'default'
+html_theme = 'flask_small'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-#html_theme_options = {}
+html_theme_options = {
+    'github_fork': 'rehandalal/flask-funnel'
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
-#html_theme_path = []
+html_theme_path = ['_themes']
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
@@ -183,7 +185,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'flask-funnel.tex', u'flask-funnel Documentation',
+  ('index', 'flask-funnel.tex', u'Flask-Funnel Documentation',
    u'Rehan Dalal', 'manual'),
 ]
 
@@ -213,7 +215,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'flask-funnel', u'flask-funnel Documentation',
+    ('index', 'flask-funnel', u'Flask-Funnel Documentation',
      [u'Rehan Dalal'], 1)
 ]
 
@@ -227,8 +229,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'flask-funnel', u'flask-funnel Documentation',
-   u'Rehan Dalal', 'flask-funnel', 'One line description of project.',
+  ('index', 'flask-funnel', u'Flask-Funnel Documentation',
+   u'Rehan Dalal', 'flask-funnel', 'Asset management for Flask.',
    'Miscellaneous'),
 ]
 
