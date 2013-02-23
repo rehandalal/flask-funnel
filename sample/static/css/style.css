@@ -1,0 +1,44 @@
+body {
+    color: #000;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+}
+
+li {
+    margin: 10px 0;
+}
+
+.test-block {
+    border: 1px solid #ccc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    line-height: 32px;
+    margin: 24px 0;
+    text-align: center;
+}
+
+.name {
+    background: #fff;
+}
+
+.label {
+    font-weight: bold;
+    height: 32px;
+    position: relative;
+}
+
+.label:before {
+    background: #cc0000;
+    bottom: 0;
+    color: #fff;
+    content: 'No';
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.label.not-loaded:before {
+    background: #00cc00;
+    color: #000;
+    content: 'Yes';
+}

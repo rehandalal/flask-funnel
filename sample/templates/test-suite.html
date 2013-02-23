@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <a href="{{ url_for('index') }}">&larr; Back to index</a>
+  {{ test_block('1.css is loaded', 'css-1') }}
+  {{ test_block('2.css is loaded', 'css-2') }}
+  {{ test_block('3.css is loaded', 'css-3') }}
+
+  {{ test_block('1.less is loaded', 'less-1') }}
+  {{ test_block('2.less is loaded', 'less-2') }}
+  {{ test_block('3.less is loaded', 'less-3') }}
+{% endblock %}

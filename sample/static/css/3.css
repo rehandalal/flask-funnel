@@ -1,0 +1,9 @@
+#label-css-3:after {
+    background: #00cc00;
+    bottom: 0;
+    content: 'Yes';
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+}

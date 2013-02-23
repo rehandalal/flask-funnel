@@ -1,4 +1,7 @@
 *.py[co]
+*.less.css
+
+bundle/
 
 # Packages
 *.egg

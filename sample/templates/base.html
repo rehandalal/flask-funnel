@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+<head>
+  <title>Flask-Funnel{% if title %} | {{ title }}{% endif %}</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block before_head_end %}
+  {% endblock %}
+</head>
+<body>
+  {% block content %}
+  {% endblock %}
+  {% block before_body_end %}
+  {% endblock %}
+</body>
+</html>

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% set title = 'Index of examples' %}
+
+{% block content %}
+  <h1>Index of examples</h1>
+  <ul>
+    <li>
+      <a href="{{ url_for('example1') }}">Example 1</a>
+      <br>DEBUG enabled, basic template functions
+    </li>
+    <li>
+      <a href="{{ url_for('example2') }}">Example 2</a>
+      <br>DEBUG enabled, LESS files
+    </li>
+  </ul>
+{% endblock %}
