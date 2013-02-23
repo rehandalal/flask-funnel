@@ -15,17 +15,19 @@ def bundle_assets():
 
     LESS_BIN = current_app.config.get('LESS_BIN', 'lessc')
 
-    path_to_jar = os.path.realpath(os.path.join(os.path.dirname(__file__),
-                                                'bin',
-                                                'yuicompressor-2.4.7.jar'))
+    path_to_jar = os.path.realpath(os.path.join(
+        os.path.dirname(__file__), 'bin', 'yuicompressor-2.4.7.jar'))
 
     def get_path(item):
+        """Get the static path of an item"""
         return os.path.join(current_app.static_folder, item)
 
     def fix_urls(filename, ftype):
+        """Fix relative paths in URLs for bundles"""
         print "Fixing URL's in %s" % filename
 
         def fix_urls_regex(url, relpath):
+            """Callback to fix relative path"""
             url = url.group(1).strip('"\'')
             if url.startswith(('data:', 'http:', 'https:')):
                 return url
@@ -41,7 +43,9 @@ def bundle_assets():
 
         relpath = os.path.relpath(bundle_path,
                                   get_path(os.path.dirname(filename)))
+
         parse = lambda url: fix_urls_regex(url, relpath)
+
         css_parsed = re.sub('url\(([^)]*?)\)', parse, css_content)
 
         out_file = get_path(os.path.join('bundle', 'tmp', '%s.tmp' % filename))
@@ -54,7 +58,8 @@ def bundle_assets():
 
         return os.path.relpath(out_file, get_path('.'))
 
-    def process_file(filename, ftype):
+    def preprocess_file(filename, ftype):
+        """Preprocess the file"""
         if filename.startswith('//'):
             url = 'http:%s' % filename
         elif filename.startswith(('http:', 'https:')):
@@ -105,6 +110,7 @@ def bundle_assets():
         return get_path(filename.lstrip('/'))
 
     def minify(ftype, file_in, file_out):
+        """Minify the file"""
         if ftype == 'js' and current_app.config.has_key('UGLIFY_BIN'):
             o = {'method': 'UglifyJS',
                  'bin': current_app.config.get('UGLIFY_BIN')}
@@ -124,33 +130,39 @@ def bundle_assets():
 
         print "Minifying %s (using %s)" % (file_in, o['method'])
 
+    # Assemble bundles and process
     bundles = {'css': current_app.config.get('CSS_BUNDLES'),
                'js': current_app.config.get('JS_BUNDLES'),}
 
     for ftype, bundle in bundles.iteritems():
         for name, files in bundle.iteritems():
-            concatted_file = get_path('bundle/%s/%s-all.%s'
-                                      % (ftype, name, ftype,))
-            compressed_file = get_path('bundle/%s/%s-min.%s'
-                                       % (ftype, name, ftype,))
+            concatenated_file = get_path(os.path.join(
+                'bundle', ftype, '%s-all.%s' % (name, ftype,)))
+            compressed_file = get_path(os.path.join(
+                'bundle', ftype, '%s-min.%s' % (name, ftype,)))
 
-            if not os.path.exists(os.path.dirname(concatted_file)):
-                os.makedirs(os.path.dirname(concatted_file))
+            if not os.path.exists(os.path.dirname(concatenated_file)):
+                os.makedirs(os.path.dirname(concatenated_file))
 
             all_files = []
             for fn in files:
-                processed = process_file(fn, ftype)
+                processed = preprocess_file(fn, ftype)
                 if processed is not None:
                     all_files.append(processed)
 
             # Concatenate
             if len(all_files) == 0:
                 print "Warning: '%s' is an empty bundle." % bundle
+
             subprocess.call("cat %s > %s" %
-                            (' '.join(all_files), concatted_file), shell=True)
+                (' '.join(all_files), concatenated_file), shell=True)
 
             # Minify
-            minify(ftype, concatted_file, compressed_file)
+            minify(ftype, concatenated_file, compressed_file)
+
+            # Remove concatenated file
+            print 'Remove concatenated file'
+            os.remove(concatenated_file)
 
     # Cleanup
     print 'Clean up temporary files'
