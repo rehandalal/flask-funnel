@@ -1,5 +1,5 @@
 ============
-flask-funnel
+Flask-Funnel
 ============
 
 Asset management for Flask.
