@@ -1,5 +1,7 @@
 *.py[co]
 *.less.css
+*-min.css
+*-min.js
 
 bundle/
 

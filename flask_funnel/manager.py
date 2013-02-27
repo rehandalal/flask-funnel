@@ -18,6 +18,8 @@ def bundle_assets():
     path_to_jar = os.path.realpath(os.path.join(
         os.path.dirname(__file__), 'bin', 'yuicompressor-2.4.7.jar'))
 
+    tmp_files = []
+
     def get_path(item):
         """Get the static path of an item"""
         return os.path.join(current_app.static_folder, item)
@@ -39,7 +41,8 @@ def bundle_assets():
         with open(get_path(filename), 'r') as css_in:
             css_content = css_in.read()
 
-        bundle_path = get_path(os.path.join('bundle', ftype))
+        bundle_path = get_path(os.path.join(
+            current_app.config.get('BUNDLES_DIR'), ftype))
 
         relpath = os.path.relpath(bundle_path,
                                   get_path(os.path.dirname(filename)))
@@ -48,7 +51,8 @@ def bundle_assets():
 
         css_parsed = re.sub('url\(([^)]*?)\)', parse, css_content)
 
-        out_file = get_path(os.path.join('bundle', 'tmp', '%s.tmp' % filename))
+        out_file = get_path(os.path.join(current_app.config.get('BUNDLES_DIR'),
+                                         'tmp', '%s.tmp' % filename))
 
         if not os.path.exists(os.path.dirname(out_file)):
             os.makedirs(os.path.dirname(out_file))
@@ -101,6 +105,7 @@ def bundle_assets():
                 return None
         else:
             filename = fix_urls(filename, ftype)
+            tmp_files.append(filename)
 
         if filename.endswith('.less'):
             fp = get_path(filename.lstrip('/'))
@@ -137,9 +142,11 @@ def bundle_assets():
     for ftype, bundle in bundles.iteritems():
         for name, files in bundle.iteritems():
             concatenated_file = get_path(os.path.join(
-                'bundle', ftype, '%s-all.%s' % (name, ftype,)))
+                current_app.config.get('BUNDLES_DIR'), ftype,
+                '%s-all.%s' % (name, ftype,)))
             compressed_file = get_path(os.path.join(
-                'bundle', ftype, '%s-min.%s' % (name, ftype,)))
+                current_app.config.get('BUNDLES_DIR'), ftype,
+                '%s-min.%s' % (name, ftype,)))
 
             if not os.path.exists(os.path.dirname(concatenated_file)):
                 os.makedirs(os.path.dirname(concatenated_file))
@@ -166,4 +173,15 @@ def bundle_assets():
 
     # Cleanup
     print 'Clean up temporary files'
-    shutil.rmtree(get_path(os.path.join('bundle', 'tmp')))
+    for file in tmp_files:
+        try:
+            os.remove(get_path(file))
+            os.rmdir(os.path.dirname(get_path(file)))
+        except OSError:
+            pass
+
+    try:
+        os.rmdir(get_path(os.path.join(current_app.config.get('BUNDLES_DIR'),
+                                       'tmp')))
+    except OSError:
+        pass

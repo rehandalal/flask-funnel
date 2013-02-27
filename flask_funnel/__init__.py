@@ -18,6 +18,7 @@ class Funnel(object):
 
         app.config.setdefault('CSS_MEDIA_DEFAULT', 'screen,projection,tv')
         app.config.setdefault('LESS_PREPROCESS', False)
+        app.config.setdefault('BUNDLES_DIR', 'bundles')
 
         app.config.setdefault('CSS_BUNDLES', {})
         app.config.setdefault('JS_BUNDLES', {})
@@ -39,7 +40,11 @@ class Funnel(object):
             def get_mtime(item):
                 if item.startswith(('//', 'http://', 'https://')):
                     return int(time.time())
-                return int(os.path.getmtime(get_path(item)))
+
+                try:
+                    return int(os.path.getmtime(get_path(item)))
+                except OSError:
+                    return int(time.time())
 
             def build_html(items, wrapper):
                 return Markup('\n'.join((wrapper % (get_url(item))
@@ -67,14 +72,17 @@ class Funnel(object):
                         subprocess.Popen([app.config.get('LESS_BIN', 'lessc'),
                                           path_less], stdout=output)
 
+                return path_css
+
             def js(bundle, defer=False, async=False, debug=app.debug):
                 if debug:
                     items = ['%s?build=%s' % (item, get_mtime(item)) for item in
-                             app.config.get('JS_BUNDLE')[bundle]]
+                             app.config.get('JS_BUNDLES')[bundle]]
                 else:
-                    bundle_file = 'bundles/js/%s-min.js' % bundle
+                    bundle_file = os.path.join(app.config.get('BUNDLES_DIR'),
+                                               'js', '%s-min.js' % bundle)
                     items = ('%s?build=%s' % (bundle_file,
-                                              get_mtime(bundle_file),),)
+                                              get_mtime(bundle_file)),)
 
                 attrs = ['src="%s"']
 
@@ -96,20 +104,19 @@ class Funnel(object):
                     for item in app.config.get('CSS_BUNDLES')[bundle]:
                         if (item.endswith('.less') and
                             app.config.get('LESS_PREPROCESS')):
-                            compile_less(item)
-                            items.append('%s.css' % item)
-                        else:
-                            items.append(item)
+                            item = compile_less(item)
+                        items.append(item)
 
                     # Add timestamp to avoid caching.
                     items = ['%s?build=%s' % (item, get_mtime(item))
                              for item in items]
                 else:
-                    bundle_file = 'bundles/css/%s-min.css' % bundle
+                    bundle_file = os.path.join(app.config.get('BUNDLES_DIR'),
+                                               'css', '%s-min.css' % bundle)
                     items = ('%s?build=%s' % (bundle_file,
                                               get_mtime(bundle_file),),)
 
                 return build_html(items,
-                                  '<link rel="stylesheet" media="%s" href="%%s" />' % media)
+                    '<link rel="stylesheet" media="%s" href="%%s" />' % media)
 
             return dict(js=js, css=css)
