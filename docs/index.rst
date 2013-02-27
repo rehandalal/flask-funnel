@@ -55,6 +55,13 @@ A dict of JavaScript bundles::
 
 *Default:* ``'screen,projection,tv'``
 
+**BUNDLES_DIR**
+
+The subdirectory of the static directory that the generated bundles are saved
+to.
+
+*Default:* ``'bundles'``
+
 **JAVA_BIN**
 
 If you plan on using `YUI Compressor`_ you must set this variable.
