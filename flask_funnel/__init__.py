@@ -1,3 +1,5 @@
+from __future__ import with_statement
+
 import os
 import subprocess
 import time
@@ -53,8 +55,8 @@ class Funnel(object):
             def ensure_path_exists(path):
                 try:
                     os.makedirs(path)
-                except OSError as e:
-                    if e.errno != os.errno.EEXIST:
+                except OSError:
+                    if OSError.errno != OSError.errno.EEXIST:
                         raise
 
             def compile_less(item):
