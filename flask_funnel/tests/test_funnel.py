@@ -34,19 +34,19 @@ class FunnelTestCase(unittest.TestCase):
     def test_css_helper_function(self):
         """Test the css() helper function"""
         data = self.client.get('/').data
-        assert '/static/bundles/css/css-bundle-min.css' in data
+        assert '"/static/bundles/css/css-bundle-min.css' in data
 
         self.app.config['DEBUG'] = True
         data = self.client.get('/').data
-        assert '/static/css/test.css' in data
-        assert '/static/less/test.less' in data
+        assert '"/static/css/test.css' in data
+        assert '"/static/less/test.less' in data
 
     def test_js_helper_function(self):
         """Test the js() helper function"""
         data = self.client.get('/').data
-        assert '/static/bundles/js/js-bundle-min.js' in data
+        assert '"/static/bundles/js/js-bundle-min.js' in data
 
         self.app.config['DEBUG'] = True
         data = self.client.get('/').data
-        assert '/static/js/test1.js' in data
-        assert '/static/js/test2.js' in data
+        assert '"/static/js/test1.js' in data
+        assert '"/static/js/test2.js' in data

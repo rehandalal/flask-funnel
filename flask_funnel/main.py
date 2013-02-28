@@ -60,7 +60,8 @@ class Funnel(object):
                         raise
 
             def compile_less(item):
-                path_css = get_path('%s.css' % item)
+                filename = '%s.css' % item
+                path_css = get_path(filename)
                 path_less = get_path(item)
 
                 updated_less = os.path.getmtime(get_path(item))
@@ -74,7 +75,7 @@ class Funnel(object):
                         subprocess.Popen([app.config.get('LESS_BIN', 'lessc'),
                                           path_less], stdout=output)
 
-                return path_css
+                return filename
 
             def js(bundle, defer=False, async=False, debug=app.debug):
                 if debug:
