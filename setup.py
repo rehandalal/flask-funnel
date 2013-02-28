@@ -4,7 +4,7 @@ from setuptools import setup
 
 
 ROOT = os.path.abspath(os.path.dirname(__file__))
-VERSIONFILE = os.path.join('flask_mobility', '_version.py')
+VERSIONFILE = os.path.join('flask_funnel', '_version.py')
 VSRE = r"""^__version__ = ['"]([^'"]*)['"]"""
 
 
