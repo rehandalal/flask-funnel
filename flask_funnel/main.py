@@ -56,7 +56,7 @@ class Funnel(object):
                 try:
                     os.makedirs(path)
                 except OSError, e:
-                    if e.errno != e.errno.EEXIST:
+                    if e.errno != os.errno.EEXIST:
                         raise
 
             def compile_less(item):
