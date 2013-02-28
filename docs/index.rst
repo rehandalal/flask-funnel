@@ -1,12 +1,16 @@
-Flask-Funnel
-============
+==============
+ Flask-Funnel
+==============
 
-The **Flask-Funnel** extension provides support for bundling and minification of
-assets for `Flask`_.
+.. contents::
+   :local:
+
+
+.. include:: ../README.rst
 
 
 Requirements
-------------
+============
 
 * **Flask 0.8** (or later)
 
@@ -21,81 +25,84 @@ Optionally:
 
 
 Configuration
--------------
+=============
 
 There are several configuration options available for **Flask-Funnel**:
 
 **CSS_BUNDLES**
 
-A dict of CSS bundles::
+    A dict of CSS bundles::
 
-    app.config['CSS_BUNDLES'] = {
-        'bundle1': (
-            'stylesheet.css',
-            'another.css',
-        ),
-    }
+        app.config['CSS_BUNDLES'] = {
+            'bundle1': (
+                'stylesheet.css',
+                'another.css',
+            ),
+        }
 
-*Default:* ``{}``
+    Defaults to: ``{}``
 
 **JS_BUNDLES**
 
-A dict of JavaScript bundles::
+    A dict of JavaScript bundles::
 
-    app.config['JS_BUNDLES'] = {
-        'the_bundle': (
-            'jquery.js',
-            'jquery-ui.js',
-        ),
-    }
+        app.config['JS_BUNDLES'] = {
+            'the_bundle': (
+                'jquery.js',
+                'jquery-ui.js',
+            ),
+        }
 
-*Default:* ``{}``
+    Defaults to: ``{}``
 
 **CSS_MEDIA_DEFAULT**
 
-*Default:* ``'screen,projection,tv'``
+    This is the default value for the media attribute of the <link> tag for
+    stylesheets.
+
+    Defaults to: ``'screen,projection,tv'``
 
 **BUNDLES_DIR**
 
-The subdirectory of the static directory that the generated bundles are saved
-to.
+    The subdirectory of the static directory that the generated bundles are saved
+    to.
 
-*Default:* ``'bundles'``
+    Defaults to: ``'bundles'``
 
 **JAVA_BIN**
 
-If you plan on using `YUI Compressor`_ you must set this variable.
+    If you plan on using `YUI Compressor`_ you must set this variable.
 
-*It has no default value.*
+    *It has no default value.*
 
 **LESS_BIN**
 
-If you require `LESS`_ support you must point this to ``lessc``.
+    If you require `LESS`_ support you must point this to ``lessc``.
 
-*Default:* ``'lessc'``
+    Defaults to: ``'lessc'``
 
 **LESS_PREPROCESS**
 
-If you want LESS files to be compiled when ``app.debug`` is ``True`` and
-compressed files are not being used.
+    If you want LESS files to be compiled when ``app.debug`` is ``True`` and
+    compressed files are not being used.
 
-*Default:* ``True``
+    Defaults to: ``True``
 
 **UGLIFY_BIN**
 
-If you want to use `UglifyJS`_ you must set this variable.
+    If you want to use `UglifyJS`_ you must set this variable.
 
-*It has no default value.*
+    *It has no default value.*
 
 **CLEANCSS_BIN**
 
-If you want to use `clean-css`_ you must set this variable.
+    If you want to use `clean-css`_ you must set this variable.
 
-*It has no default value.*
+    *It has no default value.*
 
 
 Including bundles in templates
-------------------------------
+==============================
 
 To include a bundle in a template you can use the ``css()``  or ``js()``
 function::
@@ -119,12 +126,11 @@ Note: When ``app.debug`` is ``True`` these will output markup for each file in
 the bundle.
 
 Media types for stylesheets
-...........................
+---------------------------
 
 The ``css()`` function will, by default, generate ``<link>`` tags with a
 ``media`` attribute set to ``CSS_MEDIA_DEFAULT``. You can override this by
 passing an optional second argument.
-
 
 Using the manager to bundle and minify assets
 ---------------------------------------------
@@ -146,6 +152,12 @@ This will create a ``bundle`` folder within the app's static folder to store the
 bundled files. CSS bundles go into a ``css`` subfolder and JavaScript bundles go
 into the ``js`` subfolder. Each of these subfolders will have a number of
 ``*-min.*`` files which are the compressed and minified versions of the bundles.
+
+
+.. include:: ../CHANGELOG
+
+
+.. include:: ../CONTRIBUTORS
 
 
 .. _clean-css: http://github.com/GoalSmashers/clean-css
