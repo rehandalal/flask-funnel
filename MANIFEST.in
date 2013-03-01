@@ -2,6 +2,7 @@ include CHANGELOG
 include CONTRIBUTORS
 include LICENSE
 include README.rst
+include flask_funnel/bin/yuicompressor-2.4.7.jar
 recursive-include docs *
 recursive-exclude docs *.pyc
 recursive-exclude docs *.pyo
