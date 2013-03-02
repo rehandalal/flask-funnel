@@ -16,9 +16,9 @@ def bundle_assets():
     """Compress and minify assets"""
 
     LESS_BIN = current_app.config.get('LESS_BIN', 'lessc')
+    YUI_COMPRESSOR_BIN = current_app.config.get('YUICOMPRESSOR_BIN')
 
-    path_to_jar = os.path.realpath(os.path.join(
-        os.path.dirname(__file__), 'bin', 'yuicompressor-2.4.7.jar'))
+    path_to_jar = YUI_COMPRESSOR_BIN
 
     tmp_files = []
 

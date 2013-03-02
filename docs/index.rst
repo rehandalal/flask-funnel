@@ -24,6 +24,17 @@ Optionally:
 * **LESS**: if you need to compile `LESS`_ files.
 
 
+Installing YUI Compressor
+=========================
+
+To use `YUI Compressor`_ you must install Java. Once Java has been installed
+make sure to set ``JAVA_BIN`` in your application config.
+
+You can download YUI Compressor from
+`<https://github.com/yui/yuicompressor/downloads>`_ and make sure that
+``YUI_COMPRESSOR_BIN`` points to the ``yuicompressor-x.y.z.jar`` file.
+
+
 Configuration
 =============
 
@@ -72,6 +83,12 @@ There are several configuration options available for **Flask-Funnel**:
     to.
 
     Defaults to: ``'bundles'``
+
+**YUI_COMPRESSOR_BIN**
+
+    If you plan on using `YUI Compressor`_ you must set this variable.
+
+    *It has no default value.*
 
 **JAVA_BIN**
 
