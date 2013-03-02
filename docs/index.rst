@@ -31,7 +31,9 @@ There are several configuration options available for **Flask-Funnel**:
 
 **CSS_BUNDLES**
 
-    A dict of CSS bundles::
+    A dict of CSS bundles:
+
+    .. code-block:: python
 
         app.config['CSS_BUNDLES'] = {
             'bundle1': (
@@ -44,7 +46,9 @@ There are several configuration options available for **Flask-Funnel**:
 
 **JS_BUNDLES**
 
-    A dict of JavaScript bundles::
+    A dict of JavaScript bundles:
+
+    .. code-block:: python
 
         app.config['JS_BUNDLES'] = {
             'the_bundle': (
@@ -105,7 +109,9 @@ Including bundles in templates
 ==============================
 
 To include a bundle in a template you can use the ``css()``  or ``js()``
-function::
+function:
+
+.. code-block:: html+jinja
 
     {# Jinja2 template #}
     <!doctype html>
@@ -120,10 +126,12 @@ function::
     </body>
     </html>
 
+
 This will generate the appropriate markup for each bundle.
 
 Note: When ``app.debug`` is ``True`` these will output markup for each file in
 the bundle.
+
 
 Media types for stylesheets
 ---------------------------
@@ -132,11 +140,14 @@ The ``css()`` function will, by default, generate ``<link>`` tags with a
 ``media`` attribute set to ``CSS_MEDIA_DEFAULT``. You can override this by
 passing an optional second argument.
 
+
 Using the manager to bundle and minify assets
 ---------------------------------------------
 
 The extension provides a sub-manager for `Flask-Script`_ which can be used as
-follows::
+follows:
+
+.. code-block:: python
 
     from flask.ext.script import Manager
     from flask.ext.funnel.manager import manager as funnel_manager
@@ -144,9 +155,11 @@ follows::
     manager = Manager(app)
     manager.add_command('funnel', funnel_manager)
 
+
 You can now use the manager to bundle and minify your assets using::
 
     $ ./manage.py funnel bundle_assets
+
 
 This will create a ``bundle`` folder within the app's static folder to store the
 bundled files. CSS bundles go into a ``css`` subfolder and JavaScript bundles go
