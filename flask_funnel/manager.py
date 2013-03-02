@@ -105,15 +105,17 @@ def bundle_assets():
             else:
                 print ' - Not a valid remote file %s' % filename
                 return None
-        else:
-            filename = fix_urls(filename, ftype)
-            tmp_files.append(filename)
 
         if filename.endswith('.less'):
             fp = get_path(filename.lstrip('/'))
             subprocess.call('%s %s %s.css' % (LESS_BIN, fp, fp),
                             shell=True, stdout=subprocess.PIPE)
             filename = '%s.css' % filename
+
+        if url is None:
+            filename = fix_urls(filename, ftype)
+            tmp_files.append(filename)
+
         return get_path(filename.lstrip('/'))
 
     def minify(ftype, file_in, file_out):
