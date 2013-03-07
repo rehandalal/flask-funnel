@@ -26,7 +26,7 @@ def bundle_assets():
         """Get the static path of an item"""
         return os.path.join(current_app.static_folder, item)
 
-    def fix_urls(filename, ftype):
+    def fix_urls(filename, compressed_file):
         """Fix relative paths in URLs for bundles"""
         print "Fixing URL's in %s" % filename
 
@@ -43,10 +43,7 @@ def bundle_assets():
         with open(get_path(filename), 'r') as css_in:
             css_content = css_in.read()
 
-        bundle_path = get_path(os.path.join(
-            current_app.config.get('BUNDLES_DIR'), ftype))
-
-        relpath = os.path.relpath(bundle_path,
+        relpath = os.path.relpath(os.path.dirname(compressed_file),
                                   get_path(os.path.dirname(filename)))
 
         parse = lambda url: fix_urls_regex(url, relpath)
@@ -64,7 +61,7 @@ def bundle_assets():
 
         return os.path.relpath(out_file, get_path('.'))
 
-    def preprocess_file(filename, ftype):
+    def preprocess_file(filename, compressed_file):
         """Preprocess the file"""
         if filename.startswith('//'):
             url = 'http:%s' % filename
@@ -113,7 +110,7 @@ def bundle_assets():
             filename = '%s.css' % filename
 
         if url is None:
-            filename = fix_urls(filename, ftype)
+            filename = fix_urls(filename, compressed_file)
             tmp_files.append(filename)
 
         return get_path(filename.lstrip('/'))
@@ -157,7 +154,7 @@ def bundle_assets():
 
             all_files = []
             for fn in files:
-                processed = preprocess_file(fn, ftype)
+                processed = preprocess_file(fn, compressed_file)
                 if processed is not None:
                     all_files.append(processed)
 
