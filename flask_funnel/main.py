@@ -28,8 +28,6 @@ class Funnel(object):
 
         @app.context_processor
         def context_processor():
-            less_compiling = 0
-
             def get_path(item):
                 return os.path.join(app.static_folder, item)
 
@@ -82,7 +80,6 @@ class Funnel(object):
                 if updated_less > updated_css:
                     ensure_path_exists(os.path.dirname(path_css))
                     with open(path_css, 'w') as output:
-                        less_compiling += 1
                         subprocess.Popen([app.config.get('LESS_BIN', 'lessc'),
                                           path_less], stdout=output)
 
@@ -114,10 +111,12 @@ class Funnel(object):
                     media = app.config.get('CSS_MEDIA_DEFAULT')
 
                 if debug:
+                    less_compiling = 0
                     items = []
                     for item in app.config.get('CSS_BUNDLES')[bundle]:
                         if (item.endswith('.less') and
-                            app.config.get('LESS_PREPROCESS')):
+                                app.config.get('LESS_PREPROCESS')):
+                            less_compiling += 1
                             item = compile_less(item)
                         items.append(item)
 
