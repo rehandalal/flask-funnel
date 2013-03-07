@@ -1,10 +1,10 @@
 from __future__ import with_statement
 
+import math
 import os
 import subprocess
 import time
 
-from flask import url_for
 from jinja2 import Markup
 
 class Funnel(object):
@@ -21,16 +21,24 @@ class Funnel(object):
         app.config.setdefault('CSS_MEDIA_DEFAULT', 'screen,projection,tv')
         app.config.setdefault('LESS_PREPROCESS', False)
         app.config.setdefault('BUNDLES_DIR', 'bundles')
+        app.config.setdefault('FUNNEL_USE_S3', False)
 
         app.config.setdefault('CSS_BUNDLES', {})
         app.config.setdefault('JS_BUNDLES', {})
 
         @app.context_processor
         def context_processor():
+            less_compiling = 0
+
             def get_path(item):
                 return os.path.join(app.static_folder, item)
 
             def get_url(item):
+                if app.config.get('FUNNEL_USE_S3'):
+                    try:
+                        from flask.ext.s3 import url_for
+                    except ImportError:
+                        from flask import url_for
                 if item.startswith(('//', 'http://', 'https://')):
                     return item
                 item = item.split('?', 1)
@@ -72,6 +80,7 @@ class Funnel(object):
                 if updated_less > updated_css:
                     ensure_path_exists(os.path.dirname(path_css))
                     with open(path_css, 'w') as output:
+                        less_compiling += 1
                         subprocess.Popen([app.config.get('LESS_BIN', 'lessc'),
                                           path_less], stdout=output)
 
@@ -113,6 +122,10 @@ class Funnel(object):
                     # Add timestamp to avoid caching.
                     items = ['%s?build=%s' % (item, get_mtime(item))
                              for item in items]
+
+                    # Sleep to allow LESS files to fully compile
+                    if less_compiling > 0:
+                        time.sleep(math.ceil(less_compiling / 4) * 1)
                 else:
                     bundle_file = os.path.join(app.config.get('BUNDLES_DIR'),
                                                'css', '%s-min.css' % bundle)

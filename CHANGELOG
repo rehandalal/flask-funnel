@@ -1,7 +1,12 @@
 What's new in Flask-Funnel
 ==========================
 
-Version 0.1: In development
----------------------------
+Version 0.1.3:
+--------------
+
+* Added support for Flask-S3
+
+Version 0.1:
+------------
 
 * first release

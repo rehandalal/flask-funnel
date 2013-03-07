@@ -121,6 +121,12 @@ There are several configuration options available for **Flask-Funnel**:
 
     *It has no default value.*
 
+**FUNNEL_USE_S3**
+
+    If you are using `Flask-S3`_ you must set this to use Flask-S3's
+    ``url_for()`` function.
+
+    Defaults to: ``False``
 
 Including bundles in templates
 ==============================
@@ -192,6 +198,7 @@ into the ``js`` subfolder. Each of these subfolders will have a number of
 
 .. _clean-css: http://github.com/GoalSmashers/clean-css
 .. _Flask: http://flask.pocoo.org/
+.. _Flask-S3: http://github.com/e-dard/flask-s3
 .. _Flask-Script: http://github.com/techniq/flask-script
 .. _GitHub: http://github.com/rehandalal/flask-funnel
 .. _LESS: http://lesscss.org/
