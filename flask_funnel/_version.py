@@ -5,5 +5,5 @@
 # * 1.0b2
 # * 1.0
 
-__version__ = '0.1.3'
+__version__ = '0.1.4'
 __releasedate__ = ''

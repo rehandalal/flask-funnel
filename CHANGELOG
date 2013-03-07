@@ -1,6 +1,11 @@
 What's new in Flask-Funnel
 ==========================
 
+Version 0.1.4:
+--------------
+
+* Fixed a bug with YUI COMPRESSOR
+
 Version 0.1.3:
 --------------
 
