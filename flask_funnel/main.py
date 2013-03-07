@@ -39,6 +39,8 @@ class Funnel(object):
                         from flask.ext.s3 import url_for
                     except ImportError:
                         from flask import url_for
+                else:
+                    from flask import url_for
                 if item.startswith(('//', 'http://', 'https://')):
                     return item
                 item = item.split('?', 1)
