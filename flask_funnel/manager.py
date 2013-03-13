@@ -33,7 +33,7 @@ def bundle_assets():
         def fix_urls_regex(url, relpath):
             """Callback to fix relative path"""
             url = url.group(1).strip('"\'')
-            if url.startswith(('data:', 'http:', 'https:')):
+            if url.startswith(('data:', 'http:', 'https:', 'attr(')):
                 return url
             else:
                 url = os.path.relpath(url, relpath)
