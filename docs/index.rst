@@ -17,11 +17,13 @@ Requirements
 One of the following:
 
 * **Java**: if you want to use `YUI Compressor`_.
-* **NodeJS**: if you want to use `UglifyJS`_ or `clean-css`_.
+* **NodeJS**: if you want to use `Coffee-Script`_ , `UglifyJS`_ or `clean-css`_.
 
 Optionally:
 
 * **LESS**: if you need to compile `LESS`_ files.
+* **SCSS**: if you need to compile `SCSS`_ files.
+* **COFFEE**: if you need to compile `COFFEE`_ files.
 
 
 Installing YUI Compressor
@@ -50,6 +52,8 @@ There are several configuration options available for **Flask-Funnel**:
             'bundle1': (
                 'stylesheet.css',
                 'another.css',
+                'tobecompile.less',
+                'tobecompile2.scss',
             ),
         }
 
@@ -65,6 +69,7 @@ There are several configuration options available for **Flask-Funnel**:
             'the_bundle': (
                 'jquery.js',
                 'jquery-ui.js',
+                'tubecompile.coffee',
             ),
         }
 
@@ -109,6 +114,19 @@ There are several configuration options available for **Flask-Funnel**:
 
     Defaults to: ``True``
 
+**SCSS_BIN**
+
+    If you require `SCSS`_ support you must point this to ``scss``.
+
+    Defaults to: ``'scss'``
+
+**SCSS_PREPROCESS**
+
+    If you want SCSS files to be compiled when ``app.debug`` is ``True`` and
+    compressed files are not being used.
+
+    Defaults to: ``True``
+
 **UGLIFY_BIN**
 
     If you want to use `UglifyJS`_ you must set this variable.
@@ -120,6 +138,19 @@ There are several configuration options available for **Flask-Funnel**:
     If you want to use `clean-css`_ you must set this variable.
 
     *It has no default value.*
+
+**COFFEE_BIN**
+
+    If you require `COFFEE`_ support you must point this to ``coffee``.
+
+    Defaults to: ``'coffee'``
+
+**COFFEE_PREPROCESS**
+
+    If you want Coffee files to be compiled when ``app.debug`` is ``True`` and
+    compressed files are not being used.
+
+    Defaults to: ``True``
 
 **FUNNEL_USE_S3**
 
@@ -204,3 +235,5 @@ into the ``js`` subfolder. Each of these subfolders will have a number of
 .. _LESS: http://lesscss.org/
 .. _UglifyJS: http://github.com/mishoo/UglifyJS
 .. _YUI Compressor: http://github.com/yui/yuicompressor
+.. _COFFEE: http://jashkenas.github.com/coffee-script/
+.. _SCSS: http://sass-lang.com/

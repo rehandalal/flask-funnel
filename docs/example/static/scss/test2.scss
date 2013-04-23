@@ -1,0 +1,10 @@
+input {
+  &[type=checkbox], &[type=radio] {
+    padding:0;
+    background:none;
+    border:none;
+    display:inline-block;
+    width:auto !important;
+    height:auto !important;
+  }
+}

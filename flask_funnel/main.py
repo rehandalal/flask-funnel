@@ -20,17 +20,30 @@ class Funnel(object):
 
         app.config.setdefault('CSS_MEDIA_DEFAULT', 'screen,projection,tv')
         app.config.setdefault('LESS_PREPROCESS', False)
+        app.config.setdefault('SCSS_PREPROCESS', False)
+        app.config.setdefault('COFFEE_PREPROCESS', False)
         app.config.setdefault('BUNDLES_DIR', 'bundles')
         app.config.setdefault('FUNNEL_USE_S3', False)
 
         app.config.setdefault('CSS_BUNDLES', {})
         app.config.setdefault('JS_BUNDLES', {})
 
+        processer_map = {
+            '.less': (app.config.get('LESS_BIN', 'lessc'), '.css', 'LESS_PREPROCESS'),
+            '.scss': (app.config.get('SCSS_BIN', 'scss'), '.css', 'SCSS_PREPROCESS'),
+            'offee': (app.config.get('COFFEE_BIN', 'coffee'), '.js', 'COFFEE_PREPROCESS'),
+        }
+
+        def get_path(item):
+            return os.path.join(app.static_folder, item)
+
+        tmp_dir = get_path(os.path.join(self.app.config.get('BUNDLES_DIR'), 'tmp'))
+
+        if not os.path.exists(tmp_dir):
+            os.makedirs(tmp_dir)
+
         @app.context_processor
         def context_processor():
-            def get_path(item):
-                return os.path.join(app.static_folder, item)
-
             def get_url(item):
                 if app.config.get('FUNNEL_USE_S3'):
                     try:
@@ -67,28 +80,51 @@ class Funnel(object):
                     if e.errno != os.errno.EEXIST:
                         raise
 
-            def compile_less(item):
-                filename = '%s.css' % item
-                path_css = get_path(filename)
-                path_less = get_path(item)
+            def precompile(processer_bin, postfix, item):
+                filename = os.path.join(self.app.config.get('BUNDLES_DIR'), 'tmp', item + postfix)
+                target_path = get_path(filename)
+                source_path = get_path(item)
 
-                updated_less = os.path.getmtime(get_path(item))
-                updated_css = 0
-                if os.path.exists(path_css):
-                    updated_css = os.path.getmtime(path_css)
+                preupdated = os.path.getmtime(get_path(item))
+                updated = 0
+                if os.path.exists(target_path):
+                    updated = os.path.getmtime(target_path)
 
-                if updated_less > updated_css:
-                    ensure_path_exists(os.path.dirname(path_css))
-                    with open(path_css, 'w') as output:
-                        subprocess.Popen([app.config.get('LESS_BIN', 'lessc'),
-                                          path_less], stdout=output)
+                if preupdated > updated:
+                    ensure_path_exists(os.path.dirname(target_path))
+                    with open(target_path, 'w') as output:
+                        #TODO use popen.wait to void the time.sleep
+                        if postfix == '.js':
+                            # deal with coffee
+                            with open(source_path, 'r') as stdin:
+                                subprocess.Popen([processer_bin, '-s', '-c'], stdout=output, stdin=stdin)
+                        else:
+                            subprocess.Popen([processer_bin, source_path], stdout=output)
 
                 return filename
 
+            def _build(bundle_tp, bundle):
+                precompiling = 0
+                items = []
+                for item in app.config.get(bundle_tp)[bundle]:
+                    processer_bin, postfix, condition = processer_map.get(item[-5:], (None, None, None))
+                    if app.config.get(condition):                            
+                        precompiling += 1
+                        item = precompile(processer_bin, postfix, item)
+                    items.append(item)
+
+                # Add timestamp to avoid caching.
+                items = ['%s?build=%s' % (item, get_mtime(item))
+                         for item in items]
+
+                # Sleep to allow precompile files to fully compile
+                if precompiling > 0:
+                    time.sleep(math.ceil(precompiling / 4) * 1)
+                return items
+
             def js(bundle, defer=False, async=False, debug=app.debug):
                 if debug:
-                    items = ['%s?build=%s' % (item, get_mtime(item)) for item in
-                             app.config.get('JS_BUNDLES')[bundle]]
+                    items = _build('JS_BUNDLES', bundle)
                 else:
                     bundle_file = os.path.join(app.config.get('BUNDLES_DIR'),
                                                'js', '%s-min.js' % bundle)
@@ -111,22 +147,7 @@ class Funnel(object):
                     media = app.config.get('CSS_MEDIA_DEFAULT')
 
                 if debug:
-                    less_compiling = 0
-                    items = []
-                    for item in app.config.get('CSS_BUNDLES')[bundle]:
-                        if (item.endswith('.less') and
-                                app.config.get('LESS_PREPROCESS')):
-                            less_compiling += 1
-                            item = compile_less(item)
-                        items.append(item)
-
-                    # Add timestamp to avoid caching.
-                    items = ['%s?build=%s' % (item, get_mtime(item))
-                             for item in items]
-
-                    # Sleep to allow LESS files to fully compile
-                    if less_compiling > 0:
-                        time.sleep(math.ceil(less_compiling / 4) * 1)
+                    items = _build('CSS_BUNDLES', bundle)
                 else:
                     bundle_file = os.path.join(app.config.get('BUNDLES_DIR'),
                                                'css', '%s-min.css' % bundle)
