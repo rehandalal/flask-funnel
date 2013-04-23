@@ -16,11 +16,18 @@ def bundle_assets():
     """Compress and minify assets"""
 
     LESS_BIN = current_app.config.get('LESS_BIN', 'lessc')
+    SCSS_BIN = current_app.config.get('SCSS_BIN', 'scss')
+    COFFEE_BIN = current_app.config.get('COFFEE_BIN', 'coffee')
     YUI_COMPRESSOR_BIN = current_app.config.get('YUI_COMPRESSOR_BIN')
 
     path_to_jar = YUI_COMPRESSOR_BIN
 
     tmp_files = []
+    processer_map = {
+        '.less': (LESS_BIN, '{exe} {input} {output}', '.css'),
+        '.scss': (SCSS_BIN, '{exe} {input} {output}', '.css'),
+        'offee': (COFFEE_BIN, 'cat {input} | {exe} -s -c > {output}', '.js'),
+    }
 
     def get_path(item):
         """Get the static path of an item"""
@@ -77,7 +84,7 @@ def bundle_assets():
                 os.makedirs(ext_media_path)
 
             filename = os.path.basename(url)
-            if filename.endswith(('.js', '.css', '.less')):
+            if filename.endswith(('.js', '.coffee', '.css', '.less')):
                 fp = get_path(filename.lstrip('/'))
                 file_path = os.path.join(ext_media_path, fp)
 
@@ -103,11 +110,19 @@ def bundle_assets():
                 print ' - Not a valid remote file %s' % filename
                 return None
 
-        if filename.endswith('.less'):
+        processer_bin, commend, postfix = processer_map.get(filename[-5:] , (None, None, None))
+
+        if processer_bin:
             fp = get_path(filename.lstrip('/'))
-            subprocess.call('%s %s %s.css' % (LESS_BIN, fp, fp),
+            filename = get_path(os.path.join(current_app.config.get('BUNDLES_DIR'),
+                                       'tmp', filename + postfix))
+
+            if not os.path.exists(os.path.dirname(filename)):
+                os.makedirs(os.path.dirname(filename))
+
+            subprocess.call(commend.format(exe=processer_bin, input=fp, output=filename),
                             shell=True, stdout=subprocess.PIPE)
-            filename = '%s.css' % filename
+            filename = filename
 
         if url is None and filename.endswith('.css'):
             filename = fix_urls(filename, compressed_file)
@@ -177,12 +192,13 @@ def bundle_assets():
     for file in tmp_files:
         try:
             os.remove(get_path(file))
-            os.rmdir(os.path.dirname(get_path(file)))
+            shutil.rmtree(os.path.dirname(get_path(file)))
         except OSError:
             pass
 
     try:
-        os.rmdir(get_path(os.path.join(current_app.config.get('BUNDLES_DIR'),
-                                       'tmp')))
+        shutil.rmtree(
+            get_path(os.path.join(current_app.config.get('BUNDLES_DIR'),
+                                  'tmp')))
     except OSError:
         pass

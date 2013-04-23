@@ -7,6 +7,8 @@ Funnel(app)
 app.config['JAVA_BIN'] = '/usr/java/latest/bin/java'
 
 app.config['LESS_PREPROCESS'] = True
+app.config['SCSS_PREPROCESS'] = True
+app.config['COFFEE_PREPROCESS'] = True
 
 app.config['CSS_BUNDLES'] = {
     '1': (
@@ -32,6 +34,16 @@ app.config['CSS_BUNDLES'] = {
         'less/2.less',
         'less/3.less',
     ),
+    'scss': (
+        'scss/test1.scss',
+        'scss/test2.scss',
+    ),
+}
+app.config['JS_BUNDLES'] = {
+    'coffee': (
+        'coffee/test1.coffee',
+        'coffee/test2.coffee',
+    ),
 }
 
 @app.route('/')
@@ -49,3 +61,9 @@ def example2():
     """Debug enabled, LESS files"""
     app.config['DEBUG'] = True
     return render_template('example2.html')
+
+@app.route('/example3')
+def example3():
+    """Debug enabled, LESS files"""
+    app.config['DEBUG'] = True
+    return render_template('example3.html')
