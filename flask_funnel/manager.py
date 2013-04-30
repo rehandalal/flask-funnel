@@ -109,7 +109,7 @@ def bundle_assets():
                             shell=True, stdout=subprocess.PIPE)
             filename = '%s.css' % filename
 
-        if url is None:
+        if url is None and filename.endswith('.css'):
             filename = fix_urls(filename, compressed_file)
             tmp_files.append(filename)
 
