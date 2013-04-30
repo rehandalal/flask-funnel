@@ -29,15 +29,19 @@ class Funnel(object):
         app.config.setdefault('JS_BUNDLES', {})
 
         processer_map = {
-            '.less': (app.config.get('LESS_BIN', 'lessc'), '.css', 'LESS_PREPROCESS'),
-            '.scss': (app.config.get('SCSS_BIN', 'scss'), '.css', 'SCSS_PREPROCESS'),
-            'offee': (app.config.get('COFFEE_BIN', 'coffee'), '.js', 'COFFEE_PREPROCESS'),
+            '.less': (app.config.get('LESS_BIN', 'lessc'), '.css',
+                      'LESS_PREPROCESS'),
+            '.scss': (app.config.get('SCSS_BIN', 'scss'), '.css',
+                      'SCSS_PREPROCESS'),
+            'offee': (app.config.get('COFFEE_BIN', 'coffee'), '.js',
+                      'COFFEE_PREPROCESS'),
         }
 
         def get_path(item):
             return os.path.join(app.static_folder, item)
 
-        tmp_dir = get_path(os.path.join(self.app.config.get('BUNDLES_DIR'), 'tmp'))
+        tmp_dir = get_path(os.path.join(self.app.config.get('BUNDLES_DIR'),
+                                        'tmp'))
 
         if not os.path.exists(tmp_dir):
             os.makedirs(tmp_dir)
@@ -81,7 +85,8 @@ class Funnel(object):
                         raise
 
             def precompile(processer_bin, postfix, item):
-                filename = os.path.join(self.app.config.get('BUNDLES_DIR'), 'tmp', item + postfix)
+                filename = os.path.join(self.app.config.get('BUNDLES_DIR'),
+                                        'tmp', item + postfix)
                 target_path = get_path(filename)
                 source_path = get_path(item)
 
@@ -97,9 +102,11 @@ class Funnel(object):
                         if postfix == '.js':
                             # deal with coffee
                             with open(source_path, 'r') as stdin:
-                                subprocess.Popen([processer_bin, '-s', '-c'], stdout=output, stdin=stdin)
+                                subprocess.Popen([processer_bin, '-s', '-c'],
+                                                 stdout=output, stdin=stdin)
                         else:
-                            subprocess.Popen([processer_bin, source_path], stdout=output)
+                            subprocess.Popen([processer_bin, source_path],
+                                             stdout=output)
 
                 return filename
 
@@ -107,7 +114,8 @@ class Funnel(object):
                 precompiling = 0
                 items = []
                 for item in app.config.get(bundle_tp)[bundle]:
-                    processer_bin, postfix, condition = processer_map.get(item[-5:], (None, None, None))
+                    processer_bin, postfix, condition = processer_map.get(
+                        item[-5:], (None, None, None))
                     if app.config.get(condition):                            
                         precompiling += 1
                         item = precompile(processer_bin, postfix, item)
@@ -154,7 +162,7 @@ class Funnel(object):
                     items = ('%s?build=%s' % (bundle_file,
                                               get_mtime(bundle_file),),)
 
-                return build_html(items,
-                                  '<link rel="stylesheet" media="%s" href="%%s" />' % media)
+                ss_html = '<link rel="stylesheet" media="%s" href="%%s" />'
+                return build_html(items, ss_html % media)
 
             return dict(js=js, css=css)

@@ -110,18 +110,21 @@ def bundle_assets():
                 print ' - Not a valid remote file %s' % filename
                 return None
 
-        processer_bin, commend, postfix = processer_map.get(filename[-5:] , (None, None, None))
+        processer_bin, command, postfix = processer_map.get(filename[-5:] ,
+                                                            (None, None, None))
 
         if processer_bin:
             fp = get_path(filename.lstrip('/'))
-            filename = get_path(os.path.join(current_app.config.get('BUNDLES_DIR'),
-                                       'tmp', filename + postfix))
+            filename = get_path(os.path.join(
+                current_app.config.get('BUNDLES_DIR'), 'tmp',
+                filename + postfix))
 
             if not os.path.exists(os.path.dirname(filename)):
                 os.makedirs(os.path.dirname(filename))
 
-            subprocess.call(commend.format(exe=processer_bin, input=fp, output=filename),
-                            shell=True, stdout=subprocess.PIPE)
+            subprocess.call(
+                command.format(exe=processer_bin, input=fp, output=filename),
+                shell=True, stdout=subprocess.PIPE)
             filename = filename
 
         if url is None and filename.endswith('.css'):
