@@ -1,10 +1,10 @@
-input {
-  &[type=checkbox], &[type=radio] {
-    padding:0;
-    background:none;
-    border:none;
-    display:inline-block;
-    width:auto !important;
-    height:auto !important;
-  }
+$green: #00cc00;
+#label-scss-2:after {
+    background: $green;
+    bottom: 0;
+    content: 'Yes';
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
 }

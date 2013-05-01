@@ -9,31 +9,25 @@ import urllib2
 from flask import current_app
 from flask.ext.script import Manager
 
+from extends import produce, mapping as extend_mapping
+
 manager = Manager(usage="Asset bundling")
+validate_postfix = [postfix for postfix, _, _ in extend_mapping]
 
 @manager.command
 def bundle_assets():
     """Compress and minify assets"""
 
-    LESS_BIN = current_app.config.get('LESS_BIN', 'lessc')
-    SCSS_BIN = current_app.config.get('SCSS_BIN', 'scss')
-    COFFEE_BIN = current_app.config.get('COFFEE_BIN', 'coffee')
     YUI_COMPRESSOR_BIN = current_app.config.get('YUI_COMPRESSOR_BIN')
 
-    path_to_jar = YUI_COMPRESSOR_BIN
-
     tmp_files = []
-    processer_map = {
-        '.less': (LESS_BIN, '{exe} {input} {output}', '.css'),
-        '.scss': (SCSS_BIN, '{exe} {input} {output}', '.css'),
-        'offee': (COFFEE_BIN, 'cat {input} | {exe} -s -c > {output}', '.js'),
-    }
 
     def get_path(item):
         """Get the static path of an item"""
         return os.path.join(current_app.static_folder, item)
 
     def fix_urls(filename, compressed_file):
+        # TODO : different type to encoding
         """Fix relative paths in URLs for bundles"""
         print "Fixing URL's in %s" % filename
 
@@ -84,50 +78,34 @@ def bundle_assets():
                 os.makedirs(ext_media_path)
 
             filename = os.path.basename(url)
-            if filename.endswith(('.js', '.coffee', '.css', '.less')):
-                fp = get_path(filename.lstrip('/'))
-                file_path = os.path.join(ext_media_path, fp)
-
-                try:
-                    req = urllib2.urlopen(url)
-                    print ' - Fetching %s ...' % url
-                except urllib2.HTTPError, e:
-                    print ' - HTTP Error %s for %s, %s' % (url, filename,
-                                                           str(e.code))
-                    return None
-                except urllib2.URLError, e:
-                    print ' - Invalid URL %s for %s, %s' % (url, filename,
-                                                            str(e.reason))
-                    return None
-
-                with open(file_path, 'w+') as fp:
-                    try:
-                        shutil.copyfileobj(req, fp)
-                    except shutil.Error:
-                        print ' - Could not copy file %s' % filename
-                filename = os.path.join('external', filename)
-            else:
+            if not any(filename.endswith(i) for i in validate_postfix):
                 print ' - Not a valid remote file %s' % filename
                 return None
 
-        processer_bin, command, postfix = processer_map.get(filename[-5:] ,
-                                                            (None, None, None))
-
-        if processer_bin:
             fp = get_path(filename.lstrip('/'))
-            filename = get_path(os.path.join(
-                current_app.config.get('BUNDLES_DIR'), 'tmp',
-                filename + postfix))
+            file_path = os.path.join(ext_media_path, fp)
 
-            if not os.path.exists(os.path.dirname(filename)):
-                os.makedirs(os.path.dirname(filename))
+            try:
+                req = urllib2.urlopen(url)
+                print ' - Fetching %s ...' % url
+            except urllib2.HTTPError, e:
+                print ' - HTTP Error %s for %s, %s' % (url, filename,
+                                                       str(e.code))
+                return None
+            except urllib2.URLError, e:
+                print ' - Invalid URL %s for %s, %s' % (url, filename,
+                                                        str(e.reason))
+                return None
 
-            subprocess.call(
-                command.format(exe=processer_bin, input=fp, output=filename),
-                shell=True, stdout=subprocess.PIPE)
-            filename = filename
+            with open(file_path, 'w+') as fp:
+                try:
+                    shutil.copyfileobj(req, fp)
+                except shutil.Error:
+                    print ' - Could not copy file %s' % filename
+            filename = os.path.join('external', filename)
 
         if url is None and filename.endswith('.css'):
+            # hack to css
             filename = fix_urls(filename, compressed_file)
             tmp_files.append(filename)
 
@@ -148,7 +126,7 @@ def bundle_assets():
         else:
             o = {'method': 'YUI Compressor',
                  'bin': current_app.config.get('JAVA_BIN')}
-            variables = (o['bin'], path_to_jar, file_in, file_out)
+            variables = (o['bin'], YUI_COMPRESSOR_BIN, file_in, file_out)
             subprocess.call("%s -jar %s %s -o %s" % variables,
                        shell=True, stdout=subprocess.PIPE)
 
@@ -172,7 +150,7 @@ def bundle_assets():
 
             all_files = []
             for fn in files:
-                processed = preprocess_file(fn, compressed_file)
+                processed = produce(fn, compressed_file)
                 if processed is not None:
                     all_files.append(processed)
 
