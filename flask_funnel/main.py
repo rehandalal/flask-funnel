@@ -7,6 +7,8 @@ import time
 
 from jinja2 import Markup
 
+from extends import produce
+
 class Funnel(object):
 
     def __init__(self, app=None):
@@ -19,32 +21,14 @@ class Funnel(object):
         self.app = app
 
         app.config.setdefault('CSS_MEDIA_DEFAULT', 'screen,projection,tv')
-        app.config.setdefault('LESS_PREPROCESS', False)
-        app.config.setdefault('SCSS_PREPROCESS', False)
-        app.config.setdefault('COFFEE_PREPROCESS', False)
         app.config.setdefault('BUNDLES_DIR', 'bundles')
         app.config.setdefault('FUNNEL_USE_S3', False)
 
         app.config.setdefault('CSS_BUNDLES', {})
         app.config.setdefault('JS_BUNDLES', {})
 
-        processer_map = {
-            '.less': (app.config.get('LESS_BIN', 'lessc'), '.css',
-                      'LESS_PREPROCESS'),
-            '.scss': (app.config.get('SCSS_BIN', 'scss'), '.css',
-                      'SCSS_PREPROCESS'),
-            'offee': (app.config.get('COFFEE_BIN', 'coffee'), '.js',
-                      'COFFEE_PREPROCESS'),
-        }
-
         def get_path(item):
             return os.path.join(app.static_folder, item)
-
-        tmp_dir = get_path(os.path.join(self.app.config.get('BUNDLES_DIR'),
-                                        'tmp'))
-
-        if not os.path.exists(tmp_dir):
-            os.makedirs(tmp_dir)
 
         @app.context_processor
         def context_processor():
@@ -56,6 +40,7 @@ class Funnel(object):
                         from flask import url_for
                 else:
                     from flask import url_for
+
                 if item.startswith(('//', 'http://', 'https://')):
                     return item
                 item = item.split('?', 1)
@@ -77,57 +62,15 @@ class Funnel(object):
                 return Markup('\n'.join((wrapper % (get_url(item))
                     for item in items)))
 
-            def ensure_path_exists(path):
-                try:
-                    os.makedirs(path)
-                except OSError, e:
-                    if e.errno != os.errno.EEXIST:
-                        raise
-
-            def precompile(processer_bin, postfix, item):
-                filename = os.path.join(self.app.config.get('BUNDLES_DIR'),
-                                        'tmp', item + postfix)
-                target_path = get_path(filename)
-                source_path = get_path(item)
-
-                preupdated = os.path.getmtime(get_path(item))
-                updated = 0
-                if os.path.exists(target_path):
-                    updated = os.path.getmtime(target_path)
-
-                if preupdated > updated:
-                    ensure_path_exists(os.path.dirname(target_path))
-                    with open(target_path, 'w') as output:
-                        #TODO use popen.wait to void the time.sleep
-                        if postfix == '.js':
-                            # deal with coffee
-                            with open(source_path, 'r') as stdin:
-                                subprocess.Popen([processer_bin, '-s', '-c'],
-                                                 stdout=output, stdin=stdin)
-                        else:
-                            subprocess.Popen([processer_bin, source_path],
-                                             stdout=output)
-
-                return filename
-
             def _build(bundle_tp, bundle):
-                precompiling = 0
                 items = []
                 for item in app.config.get(bundle_tp)[bundle]:
-                    processer_bin, postfix, condition = processer_map.get(
-                        item[-5:], (None, None, None))
-                    if app.config.get(condition):                            
-                        precompiling += 1
-                        item = precompile(processer_bin, postfix, item)
-                    items.append(item)
+                    items.append(produce(item))
 
                 # Add timestamp to avoid caching.
                 items = ['%s?build=%s' % (item, get_mtime(item))
                          for item in items]
 
-                # Sleep to allow precompile files to fully compile
-                if precompiling > 0:
-                    time.sleep(math.ceil(precompiling / 4) * 1)
                 return items
 
             def js(bundle, defer=False, async=False, debug=app.debug):
