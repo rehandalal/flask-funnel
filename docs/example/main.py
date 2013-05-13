@@ -46,9 +46,11 @@ app.config['JS_BUNDLES'] = {
     ),
 }
 
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 @app.route('/example1')
 def example1():
@@ -56,11 +58,13 @@ def example1():
     app.config['DEBUG'] = True
     return render_template('example1.html')
 
+
 @app.route('/example2')
 def example2():
     """Debug enabled, LESS files"""
     app.config['DEBUG'] = True
     return render_template('example2.html')
+
 
 @app.route('/example3')
 def example3():

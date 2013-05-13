@@ -14,6 +14,7 @@ from extends import produce, mapping as extend_mapping
 manager = Manager(usage="Asset bundling")
 validate_postfix = [postfix for postfix, _, _ in extend_mapping]
 
+
 @manager.command
 def bundle_assets():
     """Compress and minify assets"""
@@ -113,28 +114,28 @@ def bundle_assets():
 
     def minify(ftype, file_in, file_out):
         """Minify the file"""
-        if ftype == 'js' and current_app.config.has_key('UGLIFY_BIN'):
+        if ftype == 'js' and 'UGLIFY_BIN' in current_app.config:
             o = {'method': 'UglifyJS',
                  'bin': current_app.config.get('UGLIFY_BIN')}
             subprocess.call("%s -o %s %s" % (o['bin'], file_out, file_in),
                             shell=True, stdout=subprocess.PIPE)
-        elif ftype == 'css' and current_app.config.has_key('CLEANCSS_BIN'):
+        elif ftype == 'css' and 'CLEANCSS_BIN' in current_app.config:
             o = {'method': 'clean-css',
                  'bin': current_app.config.get('CLEANCSS_BIN')}
             subprocess.call("%s -o %s %s" % (o['bin'], file_out, file_in),
-                       shell=True, stdout=subprocess.PIPE)
+                            shell=True, stdout=subprocess.PIPE)
         else:
             o = {'method': 'YUI Compressor',
                  'bin': current_app.config.get('JAVA_BIN')}
             variables = (o['bin'], YUI_COMPRESSOR_BIN, file_in, file_out)
             subprocess.call("%s -jar %s %s -o %s" % variables,
-                       shell=True, stdout=subprocess.PIPE)
+                            shell=True, stdout=subprocess.PIPE)
 
         print "Minifying %s (using %s)" % (file_in, o['method'])
 
     # Assemble bundles and process
     bundles = {'css': current_app.config.get('CSS_BUNDLES'),
-               'js': current_app.config.get('JS_BUNDLES'),}
+               'js': current_app.config.get('JS_BUNDLES')}
 
     for ftype, bundle in bundles.iteritems():
         for name, files in bundle.iteritems():
@@ -158,8 +159,9 @@ def bundle_assets():
             if len(all_files) == 0:
                 print "Warning: '%s' is an empty bundle." % bundle
 
-            subprocess.call("cat %s > %s" %
-                (' '.join(all_files), concatenated_file), shell=True)
+            subprocess.call(
+                "cat %s > %s" % (' '.join(all_files), concatenated_file),
+                shell=True)
 
             # Minify
             minify(ftype, concatenated_file, compressed_file)

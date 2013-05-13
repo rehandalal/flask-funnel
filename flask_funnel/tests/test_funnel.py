@@ -3,6 +3,7 @@ import unittest
 from flask import Flask, render_template_string
 from flask.ext.funnel import Funnel
 
+
 class FunnelTestCase(unittest.TestCase):
 
     def setUp(self):
@@ -10,20 +11,20 @@ class FunnelTestCase(unittest.TestCase):
         Funnel(app)
 
         app.config['CSS_BUNDLES'] = {
-                'css-bundle': (
-                    'css/test.css',
-                    'less/test.less',
-                    'scss/test1.scss',
-                ),
-            }
+            'css-bundle': (
+                'css/test.css',
+                'less/test.less',
+                'scss/test1.scss',
+            ),
+        }
 
         app.config['JS_BUNDLES'] = {
-                'js-bundle': (
-                    'js/test1.js',
-                    'js/test2.js',
-                    'coffee/test1.coffee',
-                ),
-            }
+            'js-bundle': (
+                'js/test1.js',
+                'js/test2.js',
+                'coffee/test1.coffee',
+            ),
+        }
 
         @app.route('/')
         def index():

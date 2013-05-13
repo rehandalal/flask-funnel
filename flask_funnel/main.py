@@ -9,6 +9,7 @@ from jinja2 import Markup
 
 from extends import produce
 
+
 class Funnel(object):
 
     def __init__(self, app=None):
@@ -60,7 +61,7 @@ class Funnel(object):
 
             def build_html(items, wrapper):
                 return Markup('\n'.join((wrapper % (get_url(item))
-                    for item in items)))
+                              for item in items)))
 
             def _build(bundle_tp, bundle):
                 items = []
