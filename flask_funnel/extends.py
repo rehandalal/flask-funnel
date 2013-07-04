@@ -18,12 +18,14 @@ def extend(accept, export):
 @extend(accept=".css", export=".css")
 @extend(accept=".js", export=".js")
 def base(sin, sout, **kw):
+    # if you want use the sourcemap
+    # you could use `scss --sourcemap` of `coffee -m` to 
+    # generate the target script file that include the source map tag
     sout.write(sin.read())
 
 
 @extend(accept=".coffee", export=".js")
 def coffee(sin, sout, **kw):
-    ##TODO append mapping tag
     subprocess.call(
         [current_app.config.get("COFFEE_BIN", "coffee"), "-s", "-c"],
         stdin=sin, stdout=sout)
@@ -59,6 +61,9 @@ def produce(filepath, relate_filepath=None):
             source_path = os.path.join(current_app.static_folder, filepath)
             target_path = os.path.join(current_app.static_folder,
                                        relate_filepath)
+            if source_path == target_path:
+                # ignore the rewrite original file
+                return relate_filepath
             directory_path = os.path.dirname(target_path)
             if not os.path.exists(source_path):
                 # if you want ignore it

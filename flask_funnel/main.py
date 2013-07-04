@@ -66,7 +66,7 @@ class Funnel(object):
             def _build(bundle_tp, bundle):
                 items = []
                 for item in app.config.get(bundle_tp)[bundle]:
-                    items.append(produce(item))
+                    items.append(produce(item, relate_filepath=item))
 
                 # Add timestamp to avoid caching.
                 items = ['%s?build=%s' % (item, get_mtime(item))
