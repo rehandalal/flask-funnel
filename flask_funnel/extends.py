@@ -48,8 +48,12 @@ def produce(filepath, relate_filepath=None):
     name, postfix = os.path.splitext(filepath)
     if relate_filepath is None:
         # optional relate_filepath
-        relate_filepath = os.path.join(current_app.config.get('BUNDLES_DIR'),
-                                       "tmp", name)
+        relate_filedir = os.path.join(current_app.static_folder,
+                                      current_app.config.get('BUNDLES_DIR'),
+                                      "tmp")
+        if not os.path.exists(relate_filedir):
+            os.makedirs(relate_filedir)
+        relate_filepath = os.path.join(relate_filedir, name)
     else:
         # remove the postfix
         relate_filepath, _ = os.path.splitext(relate_filepath)
