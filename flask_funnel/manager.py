@@ -151,7 +151,7 @@ def bundle_assets():
 
             all_files = []
             for fn in files:
-                processed = produce(fn, compressed_file)
+                processed = produce(fn)
                 if processed is not None:
                     all_files.append(processed)
 
@@ -168,7 +168,7 @@ def bundle_assets():
 
             # Remove concatenated file
             print 'Remove concatenated file'
-            os.remove(concatenated_file)
+            #os.remove(concatenated_file)
 
     # Cleanup
     print 'Clean up temporary files'
