@@ -21,27 +21,22 @@ def base(sin, sout, **kw):
     # if you want use the sourcemap
     # you could use `scss --sourcemap` of `coffee -m` to 
     # generate the target script file that include the source map tag
-    sout.write(sin.read())
+    subprocess.call(["cp", sin, sout])
 
 
 @extend(accept=".coffee", export=".js")
 def coffee(sin, sout, **kw):
-    subprocess.call(
-        [current_app.config.get("COFFEE_BIN", "coffee"), "-s", "-c"],
-        stdin=sin, stdout=sout)
+    subprocess.call([current_app.config.get("COFFEE_BIN", "coffee"), "-c", "-o", sout, sin])
 
 
 @extend(accept=".less", export=".css")
 def less(sin, sout, **kw):
-    subprocess.call([current_app.config.get("LESS_BIN", "lessc"), "-"],
-                    stdin=sin, stdout=sout)
+    subprocess.call([current_app.config.get("LESS_BIN", "lessc"), sin, sout])
 
 
 @extend(accept=".scss", export=".css")
 def scss(sin, sout, **kw):
-    subprocess.call([current_app.config.get("SCSS_BIN", "scss"), "-s"],
-                    stdin=sin, stdout=sout)
-
+    subprocess.call([current_app.config.get("SCSS_BIN", "scss"), "--sourcemap", sin, sout])
 
 def produce(filepath, relate_filepath=None):
     """ return processed filepath """
@@ -59,7 +54,6 @@ def produce(filepath, relate_filepath=None):
         relate_filepath, _ = os.path.splitext(relate_filepath)
 
     for accept, export, func in mapping:
-        #print repr((accept, postfix, accept == postfix, accept is postfix))
         if accept == postfix:
             relate_filepath = relate_filepath + export
             source_path = os.path.join(current_app.static_folder, filepath)
@@ -73,11 +67,12 @@ def produce(filepath, relate_filepath=None):
                 # if you want ignore it
                 #continue
                 return relate_filepath
+            if not os.path.exists(os.path.dirname(target_path)):
+                os.makedirs(os.path.dirname(target_path))
+
             if not os.path.exists(directory_path):
                 os.makedirs(directory_path)
-            with open(source_path) as rf:
-                with open(target_path, "w") as wf:
-                    func(rf, wf)
+            func(source_path, target_path)
             return relate_filepath
 
     raise NotImplementedError("did not support the file type of %s" % filepath)
