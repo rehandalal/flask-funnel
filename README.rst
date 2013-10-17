@@ -37,6 +37,18 @@ or::
     $ pip install -r requirements.txt
 
 
+Quickstart
+==========
+
+To get started using Flask-Funnel simply add the following to your Flask app::
+
+    from flask import Flask
+    from flask.ext.import Funnel
+
+    app = Flask(__name__)
+    Funnel(app)
+
+
 Test
 ====
 

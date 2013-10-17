@@ -38,6 +38,18 @@ You can download YUI Compressor from
 ``YUI_COMPRESSOR_BIN`` points to the ``yuicompressor-x.y.z.jar`` file.
 
 
+Quickstart
+==========
+
+To get started using Flask-Funnel simply add the following to your Flask app::
+
+    from flask import Flask
+    from flask.ext.import Funnel
+
+    app = Flask(__name__)
+    Funnel(app)
+
+
 Configuration
 =============
 
