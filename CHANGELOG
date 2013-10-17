@@ -1,6 +1,28 @@
 What's new in Flask-Funnel
 ==========================
 
+Version 0.1.8:
+--------------
+
+* Added support for SASS
+* Added support for Stylus
+* Added support for CoffeeScript
+
+Version 0.1.7:
+--------------
+
+* Can now use attr() in CSS urls
+
+Version 0.1.6:
+--------------
+
+* Fixed a bug with LESS preprocessing
+
+Version 0.1.5:
+--------------
+
+* Fixed an issue with CSS relative url rewrites
+
 Version 0.1.4:
 --------------
 
