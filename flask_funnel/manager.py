@@ -9,17 +9,17 @@ import urllib2
 from flask import current_app
 from flask.ext.script import Manager
 
-from extends import produce, mapping as extend_mapping
+from extends import preprocess
 
 manager = Manager(usage="Asset bundling")
-validate_postfix = [postfix for postfix, _, _ in extend_mapping]
 
 
 @manager.command
 def bundle_assets():
     """Compress and minify assets"""
-
     YUI_COMPRESSOR_BIN = current_app.config.get('YUI_COMPRESSOR_BIN')
+
+    path_to_jar = YUI_COMPRESSOR_BIN
 
     tmp_files = []
 
@@ -28,7 +28,6 @@ def bundle_assets():
         return os.path.join(current_app.static_folder, item)
 
     def fix_urls(filename, compressed_file):
-        # TODO : different type to encoding
         """Fix relative paths in URLs for bundles"""
         print "Fixing URL's in %s" % filename
 
@@ -79,34 +78,35 @@ def bundle_assets():
                 os.makedirs(ext_media_path)
 
             filename = os.path.basename(url)
-            if not any(filename.endswith(i) for i in validate_postfix):
+            if filename.endswith(('.js', '.css', '.less')):
+                fp = get_path(filename.lstrip('/'))
+                file_path = os.path.join(ext_media_path, fp)
+
+                try:
+                    req = urllib2.urlopen(url)
+                    print ' - Fetching %s ...' % url
+                except urllib2.HTTPError, e:
+                    print ' - HTTP Error %s for %s, %s' % (url, filename,
+                                                           str(e.code))
+                    return None
+                except urllib2.URLError, e:
+                    print ' - Invalid URL %s for %s, %s' % (url, filename,
+                                                            str(e.reason))
+                    return None
+
+                with open(file_path, 'w+') as fp:
+                    try:
+                        shutil.copyfileobj(req, fp)
+                    except shutil.Error:
+                        print ' - Could not copy file %s' % filename
+                filename = os.path.join('external', filename)
+            else:
                 print ' - Not a valid remote file %s' % filename
                 return None
 
-            fp = get_path(filename.lstrip('/'))
-            file_path = os.path.join(ext_media_path, fp)
-
-            try:
-                req = urllib2.urlopen(url)
-                print ' - Fetching %s ...' % url
-            except urllib2.HTTPError, e:
-                print ' - HTTP Error %s for %s, %s' % (url, filename,
-                                                       str(e.code))
-                return None
-            except urllib2.URLError, e:
-                print ' - Invalid URL %s for %s, %s' % (url, filename,
-                                                        str(e.reason))
-                return None
-
-            with open(file_path, 'w+') as fp:
-                try:
-                    shutil.copyfileobj(req, fp)
-                except shutil.Error:
-                    print ' - Could not copy file %s' % filename
-            filename = os.path.join('external', filename)
+        filename = preprocess(filename.lstrip('/'))
 
         if url is None and filename.endswith('.css'):
-            # hack to css
             filename = fix_urls(filename, compressed_file)
             tmp_files.append(filename)
 
@@ -127,15 +127,17 @@ def bundle_assets():
         else:
             o = {'method': 'YUI Compressor',
                  'bin': current_app.config.get('JAVA_BIN')}
-            variables = (o['bin'], YUI_COMPRESSOR_BIN, file_in, file_out)
+            variables = (o['bin'], path_to_jar, file_in, file_out)
             subprocess.call("%s -jar %s %s -o %s" % variables,
                             shell=True, stdout=subprocess.PIPE)
 
         print "Minifying %s (using %s)" % (file_in, o['method'])
 
     # Assemble bundles and process
-    bundles = {'css': current_app.config.get('CSS_BUNDLES'),
-               'js': current_app.config.get('JS_BUNDLES')}
+    bundles = {
+        'css': current_app.config.get('CSS_BUNDLES'),
+        'js': current_app.config.get('JS_BUNDLES'),
+    }
 
     for ftype, bundle in bundles.iteritems():
         for name, files in bundle.iteritems():
@@ -151,7 +153,8 @@ def bundle_assets():
 
             all_files = []
             for fn in files:
-                processed = produce(fn)
+                processed = preprocess_file(fn, compressed_file)
+                print 'Processed: %s' % processed
                 if processed is not None:
                     all_files.append(processed)
 
@@ -159,29 +162,29 @@ def bundle_assets():
             if len(all_files) == 0:
                 print "Warning: '%s' is an empty bundle." % bundle
 
-            subprocess.call(
-                "cat %s > %s" % (' '.join(all_files), concatenated_file),
-                shell=True)
+            all_files = ' '.join(all_files)
+
+            subprocess.call("cat %s > %s" % (all_files, concatenated_file),
+                            shell=True)
 
             # Minify
             minify(ftype, concatenated_file, compressed_file)
 
             # Remove concatenated file
             print 'Remove concatenated file'
-            #os.remove(concatenated_file)
+            os.remove(concatenated_file)
 
     # Cleanup
     print 'Clean up temporary files'
     for file in tmp_files:
         try:
             os.remove(get_path(file))
-            shutil.rmtree(os.path.dirname(get_path(file)))
+            os.rmdir(os.path.dirname(get_path(file)))
         except OSError:
             pass
 
     try:
-        shutil.rmtree(
-            get_path(os.path.join(current_app.config.get('BUNDLES_DIR'),
-                                  'tmp')))
+        os.rmdir(get_path(os.path.join(current_app.config.get('BUNDLES_DIR'),
+                                       'tmp')))
     except OSError:
         pass

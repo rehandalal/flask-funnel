@@ -1,0 +1,7 @@
+{% extends 'test-suite.html' %}
+
+{% from 'macros/macros.html' import test_block %}
+
+{% block before_head_end %}
+  {{ css('stylus') }}
+{% endblock %}

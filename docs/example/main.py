@@ -8,6 +8,7 @@ app.config['JAVA_BIN'] = '/usr/java/latest/bin/java'
 
 app.config['LESS_PREPROCESS'] = True
 app.config['SCSS_PREPROCESS'] = True
+app.config['STYLUS_PREPROCESS'] = True
 app.config['COFFEE_PREPROCESS'] = True
 
 app.config['CSS_BUNDLES'] = {
@@ -37,6 +38,10 @@ app.config['CSS_BUNDLES'] = {
     'scss': (
         'scss/test1.scss',
         'scss/test2.scss',
+    ),
+    'stylus': (
+        'stylus/1.styl',
+        'stylus/2.styl',
     ),
 }
 app.config['JS_BUNDLES'] = {
@@ -71,3 +76,10 @@ def example3():
     """Debug enabled, LESS files"""
     app.config['DEBUG'] = True
     return render_template('example3.html')
+
+
+@app.route('/example4')
+def example4():
+    """Debug enabled, LESS files"""
+    app.config['DEBUG'] = True
+    return render_template('example4.html')

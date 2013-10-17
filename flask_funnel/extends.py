@@ -8,71 +8,64 @@ from flask import current_app
 mapping = []
 
 
-def extend(accept, export):
+def extend(accept, export, preprocess_setting=None):
     def _wrapper(func):
-        mapping.append((accept, export, func))
+        mapping.append((accept, export, preprocess_setting, func))
         return func
     return _wrapper
 
 
-@extend(accept=".css", export=".css")
-@extend(accept=".js", export=".js")
-def base(sin, sout, **kw):
-    # if you want use the sourcemap
-    # you could use `scss --sourcemap` of `coffee -m` to 
-    # generate the target script file that include the source map tag
-    subprocess.call(["cp", sin, sout])
-
-
-@extend(accept=".coffee", export=".js")
+@extend(accept='.coffee', export='.js',
+        preprocess_setting='COFFEE_PREPROCESS')
 def coffee(sin, sout, **kw):
-    subprocess.call([current_app.config.get("COFFEE_BIN", "coffee"), "-c", "-o", sout, sin])
+    subprocess.call([current_app.config.get('COFFEE_BIN', 'coffee'),
+                     '-c', '-o', sout, sin])
 
 
-@extend(accept=".less", export=".css")
+@extend(accept='.less', export='.css',
+        preprocess_setting='LESS_PREPROCESS')
 def less(sin, sout, **kw):
-    subprocess.call([current_app.config.get("LESS_BIN", "lessc"), sin, sout])
+    subprocess.call([current_app.config.get('LESS_BIN', 'lessc'), sin, sout])
 
 
-@extend(accept=".scss", export=".css")
+@extend(accept='.scss', export='.css',
+        preprocess_setting='SCSS_PREPROCESS')
 def scss(sin, sout, **kw):
-    subprocess.call([current_app.config.get("SCSS_BIN", "scss"), "--sourcemap", sin, sout])
+    subprocess.call([current_app.config.get('SCSS_BIN', 'scss'),
+                     '--sourcemap', sin, sout])
 
-def produce(filepath, relate_filepath=None):
-    """ return processed filepath """
-    name, postfix = os.path.splitext(filepath)
-    if relate_filepath is None:
-        # optional relate_filepath
-        relate_filedir = os.path.join(current_app.static_folder,
-                                      current_app.config.get('BUNDLES_DIR'),
-                                      "tmp")
-        if not os.path.exists(relate_filedir):
-            os.makedirs(relate_filedir)
-        relate_filepath = os.path.join(relate_filedir, name)
-    else:
-        # remove the postfix
-        relate_filepath, _ = os.path.splitext(relate_filepath)
 
-    for accept, export, func in mapping:
-        if accept == postfix:
-            relate_filepath = relate_filepath + export
-            source_path = os.path.join(current_app.static_folder, filepath)
-            target_path = os.path.join(current_app.static_folder,
-                                       relate_filepath)
-            if source_path == target_path:
-                # ignore the rewrite original file
-                return relate_filepath
-            directory_path = os.path.dirname(target_path)
-            if not os.path.exists(source_path):
-                # if you want ignore it
-                #continue
-                return relate_filepath
-            if not os.path.exists(os.path.dirname(target_path)):
-                os.makedirs(os.path.dirname(target_path))
+@extend(accept='.styl', export='.css',
+        preprocess_setting='STYLUS_PREPROCESS')
+def stylus(input, output):
+    stdin = open(input, 'r')
+    stdout = open(output, 'w')
+    subprocess.call([current_app.config.get('STYLUS_BIN', 'stylus')],
+                    stdin=stdin, stdout=stdout)
 
-            if not os.path.exists(directory_path):
-                os.makedirs(directory_path)
-            func(source_path, target_path)
-            return relate_filepath
 
-    raise NotImplementedError("did not support the file type of %s" % filepath)
+def preprocess(filename):
+    for accept, export, preprocess_setting, func in mapping:
+        if (filename.endswith(accept) and
+                current_app.config.get(preprocess_setting)):
+            target_name = '%s%s' % (filename, export)
+
+            source = os.path.join(current_app.static_folder, filename)
+            target = os.path.join(current_app.static_folder, target_name)
+
+            source_mtime = os.path.getmtime(source)
+            target_mtime = 0
+            if os.path.exists(target):
+                target_mtime = os.path.getmtime(target)
+
+            if source_mtime > target_mtime:
+                try:
+                    os.makedirs(os.path.dirname(target))
+                except OSError, e:
+                    if e.errno != os.errno.EEXIST:
+                        raise
+
+                func(source, target)
+
+            return target_name
+    return filename

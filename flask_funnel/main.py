@@ -1,13 +1,11 @@
 from __future__ import with_statement
 
-import math
 import os
-import subprocess
 import time
 
 from jinja2 import Markup
 
-from extends import produce
+from extends import preprocess
 
 
 class Funnel(object):
@@ -24,6 +22,11 @@ class Funnel(object):
         app.config.setdefault('CSS_MEDIA_DEFAULT', 'screen,projection,tv')
         app.config.setdefault('BUNDLES_DIR', 'bundles')
         app.config.setdefault('FUNNEL_USE_S3', False)
+
+        app.config.setdefault('LESS_PREPROCESS', False)
+        app.config.setdefault('SCSS_PREPROCESS', False)
+        app.config.setdefault('STYLUS_PREPROCESS', False)
+        app.config.setdefault('COFFEE_PREPROCESS', False)
 
         app.config.setdefault('CSS_BUNDLES', {})
         app.config.setdefault('JS_BUNDLES', {})
@@ -66,7 +69,7 @@ class Funnel(object):
             def _build(bundle_tp, bundle):
                 items = []
                 for item in app.config.get(bundle_tp)[bundle]:
-                    items.append(produce(item, relate_filepath=item))
+                    items.append(preprocess(item))
 
                 # Add timestamp to avoid caching.
                 items = ['%s?build=%s' % (item, get_mtime(item))

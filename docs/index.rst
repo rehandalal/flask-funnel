@@ -23,6 +23,7 @@ Optionally:
 
 * **LESS**: if you need to compile `LESS`_ files.
 * **SCSS**: if you need to compile `SCSS`_ files.
+* **Stylus**: if you need to compule `Stylus`_ files.
 * **COFFEE**: if you need to compile `COFFEE`_ files.
 
 
@@ -127,6 +128,32 @@ There are several configuration options available for **Flask-Funnel**:
 
     Defaults to: ``True``
 
+**STYLUS_BIN**
+
+  If you require `Stylus`_ support you must point this to ``stylus``.
+
+  Defaults to: ``'stylus'``
+
+**STYLUS_PREPROCESS**
+
+    If you want Stylus files to be compiled when ``app.debug`` is ``True`` and
+    compressed files are not being used.
+
+    Defaults to: ``True``
+
+**COFFEE_BIN**
+
+    If you require `COFFEE`_ support you must point this to ``coffee``.
+
+    Defaults to: ``'coffee'``
+
+**COFFEE_PREPROCESS**
+
+    If you want CoffeeScript files to be compiled when ``app.debug`` is
+    ``True`` and compressed files are not being used.
+
+    Defaults to: ``True``
+
 **UGLIFY_BIN**
 
     If you want to use `UglifyJS`_ you must set this variable.
@@ -138,19 +165,6 @@ There are several configuration options available for **Flask-Funnel**:
     If you want to use `clean-css`_ you must set this variable.
 
     *It has no default value.*
-
-**COFFEE_BIN**
-
-    If you require `COFFEE`_ support you must point this to ``coffee``.
-
-    Defaults to: ``'coffee'``
-
-**COFFEE_PREPROCESS**
-
-    If you want Coffee files to be compiled when ``app.debug`` is ``True`` and
-    compressed files are not being used.
-
-    Defaults to: ``True``
 
 **FUNNEL_USE_S3**
 
@@ -237,3 +251,4 @@ into the ``js`` subfolder. Each of these subfolders will have a number of
 .. _YUI Compressor: http://github.com/yui/yuicompressor
 .. _COFFEE: http://jashkenas.github.com/coffee-script/
 .. _SCSS: http://sass-lang.com/
+.. _Stylus: http://learnboost.github.io/stylus/

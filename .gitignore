@@ -1,9 +1,11 @@
 *.py[co]
-*.less.css
-*-min.css
-*-min.js
 
-bundle/
+*.less.css
+*.scss.css
+*.styl.css
+*.coffee.js
+
+docs/example/static/bundles
 
 # Packages
 *.egg
