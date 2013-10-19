@@ -9,7 +9,7 @@ import urllib2
 from flask import current_app
 from flask.ext.script import Manager
 
-from extends import preprocess
+from extensions import preprocess
 
 manager = Manager(usage="Asset bundling")
 
