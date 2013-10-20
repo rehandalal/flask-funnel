@@ -1,6 +1,11 @@
 What's new in Flask-Funnel
 ==========================
 
+Version 0.1.9:
+--------------
+
+* Fix @import issues in Stylus
+
 Version 0.1.8:
 --------------
 

@@ -33,11 +33,12 @@ def scss(input, output, **kw):
 
 
 @add_preprocessor(accepts='.styl', exports='.css', flag='STYLUS_PREPROCESS')
-def stylus(input, output):
+def stylus(input, output, **kw):
     stdin = open(input, 'r')
     stdout = open(output, 'w')
-    subprocess.call([current_app.config.get('STYLUS_BIN')],
-                    stdin=stdin, stdout=stdout)
+    cmd = '%s --include %s' % (current_app.config.get('STYLUS_BIN'),
+                               os.path.abspath(os.path.dirname(input)))
+    subprocess.call(cmd, shell=True, stdin=stdin, stdout=stdout)
 
 
 def preprocess(filename):
