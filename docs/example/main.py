@@ -10,6 +10,7 @@ app.config['LESS_PREPROCESS'] = True
 app.config['SCSS_PREPROCESS'] = True
 app.config['STYLUS_PREPROCESS'] = True
 app.config['COFFEE_PREPROCESS'] = True
+app.config['AUTOPREFIXER_ENABLED'] = True
 
 app.config['CSS_BUNDLES'] = {
     '1': (

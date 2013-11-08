@@ -9,7 +9,7 @@ import urllib2
 from flask import current_app
 from flask.ext.script import Manager
 
-from extensions import preprocess
+from extensions import postprocess, preprocess
 
 manager = Manager(usage="Asset bundling")
 
@@ -169,6 +169,9 @@ def bundle_assets():
 
             # Minify
             minify(ftype, concatenated_file, compressed_file)
+
+            # Post process
+            postprocess(compressed_file, fix_path=False)
 
             # Remove concatenated file
             print 'Remove concatenated file'

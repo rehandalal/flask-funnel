@@ -22,16 +22,22 @@ class Funnel(object):
         app.config.setdefault('CSS_MEDIA_DEFAULT', 'screen,projection,tv')
         app.config.setdefault('BUNDLES_DIR', 'bundles')
         app.config.setdefault('FUNNEL_USE_S3', False)
-        
-        app.config.setdefault('LESS_BIN', 'lessc')
-        app.config.setdefault('SCSS_BIN', 'scss')
-        app.config.setdefault('STYLUS_BIN', 'stylus')
-        app.config.setdefault('COFFEE_BIN', 'coffee')
 
+        app.config.setdefault('LESS_BIN', 'lessc')
         app.config.setdefault('LESS_PREPROCESS', False)
+
+        app.config.setdefault('SCSS_BIN', 'scss')
         app.config.setdefault('SCSS_PREPROCESS', False)
+
+        app.config.setdefault('STYLUS_BIN', 'stylus')
         app.config.setdefault('STYLUS_PREPROCESS', False)
+
+        app.config.setdefault('COFFEE_BIN', 'coffee')
         app.config.setdefault('COFFEE_PREPROCESS', False)
+
+        app.config.setdefault('AUTOPREFIXER_BIN', 'autoprefixer')
+        app.config.setdefault('AUTOPREFIXER_ENABLED', False)
+        app.config.setdefault('AUTOPREFIXER_BROWSERS', 'last 2 versions')
 
         app.config.setdefault('CSS_BUNDLES', {})
         app.config.setdefault('JS_BUNDLES', {})

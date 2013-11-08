@@ -1,6 +1,11 @@
 What's new in Flask-Funnel
 ==========================
 
+Version 0.1.10:
+---------------
+
+* Add support for Autoprefixer
+
 Version 0.1.9:
 --------------
 

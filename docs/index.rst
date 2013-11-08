@@ -25,6 +25,7 @@ Optionally:
 * **SCSS**: if you need to compile `SCSS`_ files.
 * **Stylus**: if you need to compule `Stylus`_ files.
 * **COFFEE**: if you need to compile `COFFEE`_ files.
+* **Autoprefixer**: if you want to have your CSS files autoprefixed.
 
 
 Installing YUI Compressor
@@ -154,6 +155,26 @@ There are several configuration options available for **Flask-Funnel**:
 
     Defaults to: ``True``
 
+**AUTOPREFIXER_BIN**
+
+  If you want to use `Autoprefixer`_ you must point this to ``autoprefixer``.
+
+  Defaults to: ``'autoprefixer'``
+
+**AUTOPREFIXER_ENABLED**
+
+  Flag to indicated whether to run Autoprefixer on bundles and preprocessed
+  files.
+
+  Defaults to: ``False``
+
+**AUTOPREFIXER_BROWSERS**
+
+  Determines which browsers to prefix for. See `Autoprefixer`_ documentation
+  for more information.
+
+  Defaults to: ``'last 2 versions'``
+
 **UGLIFY_BIN**
 
     If you want to use `UglifyJS`_ you must set this variable.
@@ -252,3 +273,4 @@ into the ``js`` subfolder. Each of these subfolders will have a number of
 .. _COFFEE: http://jashkenas.github.com/coffee-script/
 .. _SCSS: http://sass-lang.com/
 .. _Stylus: http://learnboost.github.io/stylus/
+.. _Autoprefixer: https://github.com/ai/autoprefixer

@@ -5,40 +5,64 @@ import subprocess
 
 from flask import current_app
 
+
 preprocessors = []
+postprocessors = []
 
 
-def add_preprocessor(accepts, exports, flag=None):
-    def _wrapper(func):
-        preprocessors.append((accepts, exports, flag, func))
-        return func
-    return _wrapper
+def preprocessor(accepts, exports, flag=None):
+    """Decorator to add a new preprocessor"""
+    def decorator(f):
+        preprocessors.append((accepts, exports, flag, f))
+        return f
+    return decorator
 
 
-@add_preprocessor(accepts='.coffee', exports='.js', flag='COFFEE_PREPROCESS')
+def postprocessor(accepts, flag=None):
+    """Decorator to add a new postprocessor"""
+    def decorator(f):
+        postprocessors.append((accepts, flag, f))
+        return f
+    return decorator
+
+
+@preprocessor(accepts='.coffee', exports='.js', flag='COFFEE_PREPROCESS')
 def coffee(input, output, **kw):
+    """Process CoffeeScript files"""
     subprocess.call([current_app.config.get('COFFEE_BIN'),
                      '-c', '-o', output, input])
 
 
-@add_preprocessor(accepts='.less', exports='.css', flag='LESS_PREPROCESS')
+@preprocessor(accepts='.less', exports='.css', flag='LESS_PREPROCESS')
 def less(input, output, **kw):
+    """Process LESS files"""
     subprocess.call([current_app.config.get('LESS_BIN'), input, output])
 
 
-@add_preprocessor(accepts='.scss', exports='.css', flag='SCSS_PREPROCESS')
+@preprocessor(accepts='.scss', exports='.css', flag='SCSS_PREPROCESS')
 def scss(input, output, **kw):
+    """Process SASS files"""
     subprocess.call([current_app.config.get('SCSS_BIN'),
                      '--sourcemap', input, output])
 
 
-@add_preprocessor(accepts='.styl', exports='.css', flag='STYLUS_PREPROCESS')
+@preprocessor(accepts='.styl', exports='.css', flag='STYLUS_PREPROCESS')
 def stylus(input, output, **kw):
+    """Process Stylus (.styl) files"""
     stdin = open(input, 'r')
     stdout = open(output, 'w')
     cmd = '%s --include %s' % (current_app.config.get('STYLUS_BIN'),
                                os.path.abspath(os.path.dirname(input)))
     subprocess.call(cmd, shell=True, stdin=stdin, stdout=stdout)
+
+
+@postprocessor('.css', 'AUTOPREFIXER_ENABLED')
+def autoprefixer(input, **kw):
+    """Run autoprefixer"""
+    cmd = '%s -b "%s" %s' % (current_app.config.get('AUTOPREFIXER_BIN'),
+                             current_app.config.get('AUTOPREFIXER_BROWSERS'),
+                             input)
+    subprocess.call(cmd, shell=True)
 
 
 def preprocess(filename):
@@ -63,6 +87,16 @@ def preprocess(filename):
                         raise
 
                 func(source, target)
-
+                postprocess(target)
             return target_name
+    return filename
+
+
+def postprocess(filename, fix_path=False):
+    for accepts, flag, func in postprocessors:
+        if (filename.endswith(accepts) and
+                (not flag or current_app.config.get(flag))):
+            source = (filename if not fix_path else
+                      os.path.join(current_app.static_folder, filename))
+            func(source)
     return filename
