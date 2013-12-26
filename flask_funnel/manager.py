@@ -140,8 +140,8 @@ def bundle_assets():
         'js': current_app.config.get('JS_BUNDLES'),
     }
 
-    for ftype, bundle in bundles.iteritems():
-        for name, files in bundle.iteritems():
+    for ftype, bundle in bundles.items():
+        for name, files in bundle.items():
             concatenated_file = get_path(os.path.join(
                 current_app.config.get('BUNDLES_DIR'), ftype,
                 '%s-all.%s' % (name, ftype,)))
