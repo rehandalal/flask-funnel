@@ -1,6 +1,8 @@
-from flask_funnel._version import __releasedate__, __version__
-from flask_funnel import manager
-from flask_funnel.main import Funnel
+from __future__ import absolute_import
+
+from ._version import __releasedate__, __version__  # noqa
+from .manager import manager
+from .main import Funnel
 
 
 __all__ = ['Funnel', 'manager']

@@ -1,15 +1,16 @@
-from __future__ import with_statement
+from __future__ import with_statement, absolute_import, print_function
 
 import os
 import re
 import shutil
 import subprocess
-import urllib2
 
 from flask import current_app
 from flask.ext.script import Manager
 
-from extensions import postprocess, preprocess
+from .extensions import postprocess, preprocess
+from ._compat import urlopen, URLError, HTTPError
+
 
 manager = Manager(usage="Asset bundling")
 
@@ -29,7 +30,7 @@ def bundle_assets():
 
     def fix_urls(filename, compressed_file):
         """Fix relative paths in URLs for bundles"""
-        print "Fixing URL's in %s" % filename
+        print("Fixing URL's in %s" % filename)
 
         def fix_urls_regex(url, relpath):
             """Callback to fix relative path"""
@@ -83,25 +84,25 @@ def bundle_assets():
                 file_path = os.path.join(ext_media_path, fp)
 
                 try:
-                    req = urllib2.urlopen(url)
-                    print ' - Fetching %s ...' % url
-                except urllib2.HTTPError, e:
-                    print ' - HTTP Error %s for %s, %s' % (url, filename,
-                                                           str(e.code))
+                    req = urlopen(url)
+                    print(' - Fetching %s ...' % url)
+                except HTTPError as e:
+                    print(' - HTTP Error %s for %s, %s' % (url, filename,
+                                                           str(e.code)))
                     return None
-                except urllib2.URLError, e:
-                    print ' - Invalid URL %s for %s, %s' % (url, filename,
-                                                            str(e.reason))
+                except URLError as e:
+                    print(' - Invalid URL %s for %s, %s' % (url, filename,
+                                                            str(e.reason)))
                     return None
 
                 with open(file_path, 'w+') as fp:
                     try:
                         shutil.copyfileobj(req, fp)
                     except shutil.Error:
-                        print ' - Could not copy file %s' % filename
+                        print(' - Could not copy file %s' % filename)
                 filename = os.path.join('external', filename)
             else:
-                print ' - Not a valid remote file %s' % filename
+                print(' - Not a valid remote file %s' % filename)
                 return None
 
         filename = preprocess(filename.lstrip('/'))
@@ -131,7 +132,7 @@ def bundle_assets():
             subprocess.call("%s -jar %s %s -o %s" % variables,
                             shell=True, stdout=subprocess.PIPE)
 
-        print "Minifying %s (using %s)" % (file_in, o['method'])
+        print("Minifying %s (using %s)" % (file_in, o['method']))
 
     # Assemble bundles and process
     bundles = {
@@ -154,13 +155,13 @@ def bundle_assets():
             all_files = []
             for fn in files:
                 processed = preprocess_file(fn, compressed_file)
-                print 'Processed: %s' % processed
+                print('Processed: %s' % processed)
                 if processed is not None:
                     all_files.append(processed)
 
             # Concatenate
             if len(all_files) == 0:
-                print "Warning: '%s' is an empty bundle." % bundle
+                print("Warning: '%s' is an empty bundle." % bundle)
 
             all_files = ' '.join(all_files)
 
@@ -174,11 +175,11 @@ def bundle_assets():
             postprocess(compressed_file, fix_path=False)
 
             # Remove concatenated file
-            print 'Remove concatenated file'
+            print('Remove concatenated file')
             os.remove(concatenated_file)
 
     # Cleanup
-    print 'Clean up temporary files'
+    print('Clean up temporary files')
     for file in tmp_files:
         try:
             os.remove(get_path(file))
