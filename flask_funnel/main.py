@@ -1,11 +1,11 @@
-from __future__ import with_statement
+from __future__ import with_statement, absolute_import
 
 import os
 import time
 
 from jinja2 import Markup
 
-from extensions import preprocess
+from .extensions import preprocess
 
 
 class Funnel(object):

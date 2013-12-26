@@ -1,4 +1,4 @@
-from __future__ import with_statement
+from __future__ import with_statement, absolute_import
 
 import os
 import subprocess
@@ -82,7 +82,7 @@ def preprocess(filename):
             if source_mtime > target_mtime:
                 try:
                     os.makedirs(os.path.dirname(target))
-                except OSError, e:
+                except OSError as e:
                     if e.errno != os.errno.EEXIST:
                         raise
 

@@ -6,6 +6,7 @@ A Flask extension for compressing/minifying assets.
 A Flask-Script submanager is also provided.
 
 .. image:: https://api.travis-ci.org/rehandalal/flask-funnel.png
+   :target: https://travis-ci.org/rehandalal/flask-funnel
 
 
 Documentation
