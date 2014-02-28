@@ -35,7 +35,7 @@ def bundle_assets():
             """Callback to fix relative path"""
             url = url.group(1).strip('"\'')
             if url.startswith(('data:', 'http:', 'https:', 'attr(')):
-                return url
+                return 'url(%s)' % url
             else:
                 url = os.path.relpath(url, relpath)
                 return 'url(%s)' % url
