@@ -34,11 +34,9 @@ def bundle_assets():
         def fix_urls_regex(url, relpath):
             """Callback to fix relative path"""
             url = url.group(1).strip('"\'')
-            if url.startswith(('data:', 'http:', 'https:', 'attr(')):
-                return 'url(%s)' % url
-            else:
+            if not url.startswith(('data:', 'http:', 'https:', 'attr(')):
                 url = os.path.relpath(url, relpath)
-                return 'url(%s)' % url
+            return 'url(%s)' % url
 
         css_content = ''
         with open(get_path(filename), 'r') as css_in:
